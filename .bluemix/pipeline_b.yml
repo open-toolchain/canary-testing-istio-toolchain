@@ -113,7 +113,7 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
-      echo Run some validation tests
+      echo "Run some validation tests"
 - name: 50% TRAFFIC
   inputs:
   - type: job
