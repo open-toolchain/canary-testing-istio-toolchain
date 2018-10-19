@@ -3,7 +3,7 @@ stages:
 - name: BUILD
   inputs:
   - type: git
-    branch: ${GIT_BRANCH}
+    branch: master
     service: ${GIT_REPO}    
   triggers:
   - type: commit
@@ -26,7 +26,7 @@ stages:
     image_name: ${CF_APP_NAME}
     script: |-
       #!/bin/bash
-     source: https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_prebuild.sh
+      source: https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_prebuild.sh
   - name: Build Docker image
     type: builder
     build_type: cr
@@ -38,7 +38,7 @@ stages:
     image_name: ${CF_APP_NAME}
     script: |
       #!/bin/bash
-     source: https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/build_image.sh
+      source: https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/build_image.sh
 - name: VALIDATE
   inputs:
   - type: job
@@ -61,8 +61,8 @@ stages:
       api_key: ${API_KEY}
     script: |
       #!/bin/bash
-     source: https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_vulnerabilities.sh
-- name: DARK LAUNCH
+      source: https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_vulnerabilities.sh
+- name: PROD
   inputs:
   - type: job
     stage: BUILD
@@ -88,8 +88,8 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
-     source: https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_predeploy_kubectl.sh
-  - name: Deploy Dark
+      source: https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_predeploy_kubectl.sh
+  - name: Deploy to Kubernetes
     type: deployer
     target:
       region_id: ${PROD_REGION_ID}
@@ -97,4 +97,4 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
-     source: https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/deploy_kubectl.sh
+      source: https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/deploy_kubectl.sh

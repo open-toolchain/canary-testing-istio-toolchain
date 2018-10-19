@@ -26,7 +26,7 @@ services:
     service_id: hostedgit
     parameters:
       repo_name: 'guestbook-{{timestamp}}'
-      repo_url: 'https://github.com/open-toolchain/hello-containers'
+      repo_url: 'https://github.com/linsun/guestbook'
       type: clone
       has_issues: true
       enable_traceability: true
@@ -42,7 +42,7 @@ services:
           $text: pipeline_a.yml
         env:
           GIT_REPO: repo
-          GIT_BRANCH: stable
+          GIT_BRANCH: v1
           CF_APP_NAME: '{{form.pipeline.parameters.app-name}}'
           REGISTRY_REGION_ID: '{{form.pipeline.parameters.registry-region}}'
           REGISTRY_NAMESPACE: '{{form.pipeline.parameters.registry-namespace}}'
