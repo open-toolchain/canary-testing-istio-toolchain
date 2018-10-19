@@ -77,7 +77,7 @@ stages:
     value: ${PROD_CLUSTER_NAMESPACE}
     type: text
   - name: DEPLOYMENT_FILE
-    value: deployment.yml
+    value: ${DEPLOYMENT_FILE}
     type: text      
   jobs:
   - name: Pre-deploy check
