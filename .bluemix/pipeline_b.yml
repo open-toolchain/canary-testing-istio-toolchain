@@ -3,7 +3,7 @@ stages:
 - name: BUILD
   inputs:
   - type: git
-    branch: master
+    branch: ${GIT_BRANCH}
     service: ${GIT_REPO}    
   triggers:
   - type: commit
@@ -62,7 +62,7 @@ stages:
     script: |
       #!/bin/bash
       source: https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_vulnerabilities.sh
-- name: PROD
+- name: DARK LAUNCH
   inputs:
   - type: job
     stage: BUILD
@@ -89,7 +89,7 @@ stages:
     script: |
       #!/bin/bash
       source: https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_predeploy_kubectl.sh
-  - name: Deploy to Kubernetes
+  - name: Deploy dark
     type: deployer
     target:
       region_id: ${PROD_REGION_ID}
@@ -97,4 +97,90 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
+      WORKING_DIR=$(pwd)
+      mkdir ~/tmpbin && cd ~/tmpbin
+      curl -L https://git.io/getLatestIstio | sh -
+      ISTIO_BIN=$(find istio*/bin -maxdepth 0 -type d)
+      export PATH=${ISTIO_BIN}:$PATH
+      cd $WORKING_DIR
+      #kubectl apply -f install/kubernetes/istio.yaml
       source: https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/deploy_kubectl.sh
+  - name: Functional tests
+    type: deployer
+    target:
+      region_id: ${PROD_REGION_ID}
+      api_key: ${API_KEY}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |
+      #!/bin/bash
+      echo Run some validation tests
+- name: 50% TRAFFIC
+  inputs:
+  - type: job
+    stage: BUILD
+    job: Build Docker image
+  triggers:
+  - type: stage
+  properties:
+  - name: buildprops
+    value: build.properties
+    type: file
+  - name: CLUSTER_NAMESPACE
+    value: ${PROD_CLUSTER_NAMESPACE}
+    type: text     
+  jobs:
+  - name: Enable 50% traffic
+    type: deployer
+    target:
+      region_id: ${PROD_REGION_ID}
+      api_key: ${API_KEY}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |
+      #!/bin/bash
+      WORKING_DIR=$(pwd)
+      mkdir ~/tmpbin && cd ~/tmpbin
+      curl -L https://git.io/getLatestIstio | sh -
+      ISTIO_BIN=$(find istio*/bin -maxdepth 0 -type d)
+      export PATH=${ISTIO_BIN}:$PATH
+      cd $WORKING_DIR
+      #kubectl apply -f install/kubernetes/istio.yaml
+- name: 100% TRAFFIC
+  inputs:
+  - type: job
+    stage: BUILD
+    job: Build Docker image
+  triggers:
+  - type: stage
+  properties:
+  - name: buildprops
+    value: build.properties
+    type: file
+  - name: CLUSTER_NAMESPACE
+    value: ${PROD_CLUSTER_NAMESPACE}
+    type: text     
+  jobs:
+  - name: Enable 100% traffic
+    type: deployer
+    target:
+      region_id: ${PROD_REGION_ID}
+      api_key: ${API_KEY}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |
+      #!/bin/bash
+      WORKING_DIR=$(pwd)
+      mkdir ~/tmpbin && cd ~/tmpbin
+      curl -L https://git.io/getLatestIstio | sh -
+      ISTIO_BIN=$(find istio*/bin -maxdepth 0 -type d)
+      export PATH=${ISTIO_BIN}:$PATH
+      cd $WORKING_DIR
+      #kubectl apply -f install/kubernetes/istio.yaml
+  - name: Finalize
+    type: deployer
+    target:
+      region_id: ${PROD_REGION_ID}
+      api_key: ${API_KEY}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |
+      #!/bin/bash
+      echo "Could automate branch promotion for STABLE version"
+
