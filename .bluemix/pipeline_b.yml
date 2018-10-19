@@ -26,7 +26,7 @@ stages:
     image_name: ${CF_APP_NAME}
     script: |-
       #!/bin/bash
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_prebuild.sh")
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_prebuild.sh")
   - name: Build Docker image
     type: builder
     build_type: cr
@@ -38,7 +38,7 @@ stages:
     image_name: ${CF_APP_NAME}
     script: |
       #!/bin/bash
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/build_image.sh")
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/build_image.sh")
 - name: VALIDATE
   inputs:
   - type: job
@@ -61,7 +61,7 @@ stages:
       api_key: ${API_KEY}
     script: |
       #!/bin/bash
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_vulnerabilities.sh")
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_vulnerabilities.sh")
 - name: DARK LAUNCH
   inputs:
   - type: job
@@ -88,7 +88,7 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_predeploy_kubectl.sh")
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_predeploy_kubectl.sh")
   - name: Deploy dark
     type: deployer
     target:
@@ -104,7 +104,7 @@ stages:
       export PATH=${ISTIO_BIN}:$PATH
       cd $WORKING_DIR
       #kubectl apply -f install/kubernetes/istio.yaml
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/deploy_kubectl.sh")
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/deploy_kubectl.sh")
   - name: Functional tests
     type: deployer
     target:
