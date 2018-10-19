@@ -114,13 +114,11 @@ stages:
     script: |
       #!/bin/bash
       echo "Run some validation tests"
-- name: 50% TRAFFIC
+- name: 10% TRAFFIC
   inputs:
   - type: job
     stage: BUILD
     job: Build Docker image
-  triggers:
-  - type: stage
   properties:
   - name: buildprops
     value: build.properties
@@ -129,7 +127,7 @@ stages:
     value: ${PROD_CLUSTER_NAMESPACE}
     type: text     
   jobs:
-  - name: Enable 50% traffic
+  - name: Enable 10% traffic
     type: deployer
     target:
       region_id: ${PROD_REGION_ID}
@@ -149,8 +147,6 @@ stages:
   - type: job
     stage: BUILD
     job: Build Docker image
-  triggers:
-  - type: stage
   properties:
   - name: buildprops
     value: build.properties
