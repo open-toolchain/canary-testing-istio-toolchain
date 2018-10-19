@@ -9,7 +9,7 @@ stages:
   - type: commit
   properties:
   - name: DOCKER_ROOT
-    value: .
+    value: ${DOCKER_ROOT}
     type: text
   - name: DOCKER_FILE
     value: Dockerfile

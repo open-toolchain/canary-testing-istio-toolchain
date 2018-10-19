@@ -43,6 +43,7 @@ services:
         env:
           GIT_REPO: repo
           GIT_BRANCH: v1
+          DOCKER_ROOT: guestbook
           CF_APP_NAME: '{{form.pipeline.parameters.app-name}}'
           REGISTRY_REGION_ID: '{{form.pipeline.parameters.registry-region}}'
           REGISTRY_NAMESPACE: '{{form.pipeline.parameters.registry-namespace}}'
@@ -64,6 +65,7 @@ services:
         env:
           GIT_REPO: repo
           GIT_BRANCH: master
+          DOCKER_ROOT: guestbook
           CF_APP_NAME: '{{form.pipeline.parameters.app-name}}'
           REGISTRY_REGION_ID: '{{form.pipeline.parameters.registry-region}}'
           REGISTRY_NAMESPACE: '{{form.pipeline.parameters.registry-namespace}}'
