@@ -95,25 +95,7 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/deploy_kubectl.sh")
-  - name: Functional tests
-    type: deployer
-    target:
-      region_id: ${PROD_REGION_ID}
-      api_key: ${API_KEY}
-      kubernetes_cluster: ${PROD_CLUSTER_NAME}
-    script: |
-      #!/bin/bash
-      echo "Run some validation tests"
-  - name: Chaos tests
-    type: deployer
-    target:
-      region_id: ${PROD_REGION_ID}
-      api_key: ${API_KEY}
-      kubernetes_cluster: ${PROD_CLUSTER_NAME}
-    script: |
-      #!/bin/bash
-      echo "Run some chaos tests"
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/deploy_kubectl_istio.sh")
 - name: CANARY 0% TRAFFIC
   inputs:
   - type: job
@@ -151,6 +133,24 @@ stages:
           exit 1
       fi    
       echo "Provide link to Prometheus/Istio dashboard"
+  - name: Functional tests
+    type: deployer
+    target:
+      region_id: ${PROD_REGION_ID}
+      api_key: ${API_KEY}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |
+      #!/bin/bash
+      echo "Run some validation tests"
+  - name: Chaos tests
+    type: deployer
+    target:
+      region_id: ${PROD_REGION_ID}
+      api_key: ${API_KEY}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |
+      #!/bin/bash
+      echo "Run some chaos tests"
 - name: CANARY 20% TRAFFIC
   inputs:
   - type: job
@@ -173,7 +173,6 @@ stages:
     script: |
       #!/bin/bash
       echo "DEPLOYING USING MANIFEST:"
-
       if [ -z "${CANARY_FILE}" ]; then CANARY_FILE=canary.yml ; fi
       if [ -f ${CANARY_FILE} ]; then
           echo "Deploy Canary MANIFEST:"
