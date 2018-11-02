@@ -17,7 +17,7 @@ template:
     git branch: >-
       [master](https://github.com/open-toolchain/ab-testing-istio-toolchain/tree/master)
 toolchain:
-  name: 'ab-testing-toolchain-{{timestamp}}'
+  name: 'canary-test-toolchain-{{timestamp}}'
   template:
     getting_started:
       $ref: "#/messages/template.gettingStarted" 
@@ -26,7 +26,7 @@ services:
     service_id: hostedgit
     parameters:
       repo_name: 'guestbook-{{timestamp}}'
-      repo_url: 'https://github.com/linsun/guestbook'
+      repo_url: 'https://github.com/open-toolchain/guestbook'
       type: clone
       has_issues: true
       enable_traceability: true

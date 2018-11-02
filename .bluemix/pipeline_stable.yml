@@ -80,7 +80,7 @@ stages:
     value: ${DEPLOYMENT_FILE}
     type: text      
   jobs:
-  - name: Check Istio
+  - name: Config Istio
     type: deployer
     target:
       region_id: ${PROD_REGION_ID}
@@ -89,6 +89,7 @@ stages:
     script: |
       #!/bin/bash
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_istio.sh")
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/config_istio_canary.sh")
   - name: Pre-deploy check
     type: deployer
     target:

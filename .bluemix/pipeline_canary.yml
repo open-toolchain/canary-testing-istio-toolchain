@@ -60,7 +60,7 @@ stages:
     script: |
       #!/bin/bash
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_vulnerabilities.sh")
-- name: CANARY DEPLOY
+- name: DEPLOY CANARY
   inputs:
   - type: job
     stage: BUILD
@@ -87,7 +87,7 @@ stages:
     script: |
       #!/bin/bash
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_predeploy_kubectl.sh")
-  - name: Deploy canary
+  - name: Deploy dark
     type: deployer
     target:
       region_id: ${PROD_REGION_ID}
@@ -95,13 +95,6 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
-      WORKING_DIR=$(pwd)
-      mkdir ~/tmpbin && cd ~/tmpbin
-      curl -L https://git.io/getLatestIstio | sh -
-      ISTIO_BIN=$(find istio*/bin -maxdepth 0 -type d)
-      export PATH=${ISTIO_BIN}:$PATH
-      cd $WORKING_DIR
-      #kubectl apply -f install/kubernetes/istio.yaml
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/deploy_kubectl.sh")
   - name: Functional tests
     type: deployer
@@ -179,14 +172,17 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
-      WORKING_DIR=$(pwd)
-      mkdir ~/tmpbin && cd ~/tmpbin
-      curl -L https://git.io/getLatestIstio | sh -
-      ISTIO_BIN=$(find istio*/bin -maxdepth 0 -type d)
-      export PATH=${ISTIO_BIN}:$PATH
-      cd $WORKING_DIR
-      #kubectl apply -f install/kubernetes/istio.yaml
-      echo "Provide link to Prometheus/Istio dashboard"
+      echo "DEPLOYING USING MANIFEST:"
+
+      if [ -z "${CANARY_FILE}" ]; then CANARY_FILE=canary.yml ; fi
+      if [ -f ${CANARY_FILE} ]; then
+          echo "Deploy Canary MANIFEST:"
+          cat ${CANARY_FILE}
+          kubectl apply -f ${CANARY_FILE} --namespace ${CLUSTER_NAMESPACE}
+      else 
+          echo -e "${red}Istio Canary deployment file '${CANARY_FILE}' not found${no_color}"
+          exit 1
+      fi
 - name: FINALIZE
   inputs:
   - type: job
