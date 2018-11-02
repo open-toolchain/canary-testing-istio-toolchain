@@ -1,7 +1,7 @@
-# ![Icon](./.bluemix/secure-lock-kubernetes.png) Develop a Kubernetes app with A/B testing using Istio
+# ![Icon](./.bluemix/secure-lock-kubernetes.png) Develop and canary test a Kubernetes app using Istio
 
 
-### Continuous A/B Testing of a Kubernetes application using Istio
+### Develop and canary test Kubernetes application using Istio
 The sample application uses Docker with Node.js and includes a DevOps toolchain that is preconfigured for A/B testing, continuous delivery with Vulnerability Advisor, source control, issue tracking, and online editing, and deployment to the IBM Cloud Kubernetes Service.
 
 Application code is stored in source control, along with its Dockerfile and its Kubernetes deployment script.
