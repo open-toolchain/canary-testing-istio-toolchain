@@ -39,10 +39,10 @@ services:
       ui-pipeline: true
       configuration:
         content:
-          $text: pipeline_a.yml
+          $text: pipeline_stable.yml
         env:
           GIT_REPO: repo
-          GIT_BRANCH: v1
+          GIT_BRANCH: master
           DOCKER_ROOT: guestbook
           DEPLOYMENT_FILE: guestbook-deployment.yaml
           CF_APP_NAME: '{{form.pipeline.parameters.app-name}}'
@@ -58,14 +58,14 @@ services:
     parameters:
       services:
         - repo
-      name: 'NEXT-{{services.repo.parameters.repo_name}}'
+      name: 'CANARY-{{services.repo.parameters.repo_name}}'
       ui-pipeline: true
       configuration:
         content:
-          $text: pipeline_b.yml
+          $text: pipeline_canary.yml
         env:
           GIT_REPO: repo
-          GIT_BRANCH: master
+          GIT_BRANCH: next
           DOCKER_ROOT: guestbook
           DEPLOYMENT_FILE: guestbook-deployment.yaml
           CF_APP_NAME: '{{form.pipeline.parameters.app-name}}'

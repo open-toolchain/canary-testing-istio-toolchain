@@ -4,9 +4,7 @@ stages:
   inputs:
   - type: git
     branch: ${GIT_BRANCH}
-    service: ${GIT_REPO}    
-  triggers:
-  - type: commit
+    service: ${GIT_REPO}
   properties:
   - name: DOCKER_ROOT
     value: ${DOCKER_ROOT}
@@ -62,7 +60,7 @@ stages:
     script: |
       #!/bin/bash
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_vulnerabilities.sh")
-- name: DARK LAUNCH
+- name: CANARY DEPLOY
   inputs:
   - type: job
     stage: BUILD
@@ -89,7 +87,7 @@ stages:
     script: |
       #!/bin/bash
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_predeploy_kubectl.sh")
-  - name: Deploy dark
+  - name: Deploy canary
     type: deployer
     target:
       region_id: ${PROD_REGION_ID}
@@ -114,7 +112,53 @@ stages:
     script: |
       #!/bin/bash
       echo "Run some validation tests"
-- name: 10% TRAFFIC
+  - name: Chaos tests
+    type: deployer
+    target:
+      region_id: ${PROD_REGION_ID}
+      api_key: ${API_KEY}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |
+      #!/bin/bash
+      echo "Run some chaos tests"
+- name: CANARY 0% TRAFFIC
+  inputs:
+  - type: job
+    stage: BUILD
+    job: Build Docker image
+  properties:
+  - name: buildprops
+    value: build.properties
+    type: file
+  - name: CLUSTER_NAMESPACE
+    value: ${PROD_CLUSTER_NAMESPACE}
+    type: text
+  - name: DARK_TEST_FILE
+    value: virtualservice-test.yaml
+    type: text  
+  jobs:
+  - name: Route 0% traffic
+    type: deployer
+    target:
+      region_id: ${PROD_REGION_ID}
+      api_key: ${API_KEY}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |
+      #!/bin/bash
+      echo "CLUSTER_NAMESPACE=${CLUSTER_NAMESPACE}"
+      echo ""
+      echo "DEPLOYING USING MANIFEST:"
+      if [ -z "${DARK_TEST_FILE}" ]; then DARK_TEST_FILE=canary.yml ; fi
+      if [ -f ${DARK_TEST_FILE} ]; then
+          echo "Deploy dark test MANIFEST:"
+          cat ${DARK_TEST_FILE}
+          kubectl replace -f ${DARK_TEST_FILE} --namespace ${CLUSTER_NAMESPACE}
+      else 
+          echo -e "${red}Istio dark test deployment file '${DARK_TEST_FILE}' not found${no_color}"
+          exit 1
+      fi    
+      echo "Provide link to Prometheus/Istio dashboard"
+- name: CANARY 20% TRAFFIC
   inputs:
   - type: job
     stage: BUILD
@@ -127,7 +171,7 @@ stages:
     value: ${PROD_CLUSTER_NAMESPACE}
     type: text     
   jobs:
-  - name: Enable 10% traffic
+  - name: Route 20% traffic
     type: deployer
     target:
       region_id: ${PROD_REGION_ID}
@@ -142,7 +186,8 @@ stages:
       export PATH=${ISTIO_BIN}:$PATH
       cd $WORKING_DIR
       #kubectl apply -f install/kubernetes/istio.yaml
-- name: 100% TRAFFIC
+      echo "Provide link to Prometheus/Istio dashboard"
+- name: FINALIZE
   inputs:
   - type: job
     stage: BUILD
@@ -155,7 +200,7 @@ stages:
     value: ${PROD_CLUSTER_NAMESPACE}
     type: text     
   jobs:
-  - name: Enable 100% traffic
+  - name: Route 0% traffic
     type: deployer
     target:
       region_id: ${PROD_REGION_ID}
@@ -170,7 +215,8 @@ stages:
       export PATH=${ISTIO_BIN}:$PATH
       cd $WORKING_DIR
       #kubectl apply -f install/kubernetes/istio.yaml
-  - name: Finalize
+      echo "Provide link to Prometheus/Istio dashboard"
+  - name: Discard canary deploy
     type: deployer
     target:
       region_id: ${PROD_REGION_ID}
@@ -178,5 +224,11 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
-      echo "Could automate branch promotion for STABLE version"
-
+      WORKING_DIR=$(pwd)
+      mkdir ~/tmpbin && cd ~/tmpbin
+      curl -L https://git.io/getLatestIstio | sh -
+      ISTIO_BIN=$(find istio*/bin -maxdepth 0 -type d)
+      export PATH=${ISTIO_BIN}:$PATH
+      cd $WORKING_DIR
+      #kubectl apply -f install/kubernetes/istio.yaml
+      echo "Provide link to Prometheus/Istio dashboard"
