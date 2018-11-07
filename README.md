@@ -1,4 +1,4 @@
-# ![Icon](./.bluemix/secure-lock-kubernetes.png) Canary testing in Kubernetes using Istio
+# ![Icon](./.bluemix/istio-logo.png) Canary testing in Kubernetes using Istio
 
 
 ### Develop and canary test your Kubernetes application using Istio
@@ -13,7 +13,7 @@ Any code change to the Git repo will automatically be built, validated and deplo
 
 
 ### To get started, click this button:
-[![Deploy To Bluemix](https://console.bluemix.net/devops/graphics/create_toolchain_button.png)](https://console.bluemix.net/devops/setup/deploy/?repository=https%3A//github.com/open-toolchain/ab-testing-istio-toolchain)
+[![Create Toolchain](https://console.bluemix.net/devops/graphics/create_toolchain_button.png)](https://console.bluemix.net/devops/setup/deploy/?repository=https%3A//github.com/open-toolchain/canary-testing-istio-toolchain)
 
 ---
 ### Learn more 
