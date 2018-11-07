@@ -1,3 +1,9 @@
+# <table id="wrapper">
+  <tr>
+    <td><img src="./.bluemix/istio-logo.png" alt="" /></td> Canary testing in Kubernetes using Istio
+  </tr> Canary testing in Kubernetes using Istio
+</table>
+
 # ![Icon](./.bluemix/istio-logo.png) Canary testing in Kubernetes using Istio
 
 
