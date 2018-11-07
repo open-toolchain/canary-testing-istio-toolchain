@@ -1,6 +1,5 @@
 # ![Icon](./.bluemix/istio-logo.png) Canary testing in Kubernetes using Istio
 
-
 ### Develop and canary test your Kubernetes application using Istio
 The sample application uses Docker with Node.js and includes a DevOps toolchain that is preconfigured for canary testing, continuous delivery with Vulnerability Advisor, source control, issue tracking, and online editing, and deployment to the IBM Cloud Kubernetes Service.
 
