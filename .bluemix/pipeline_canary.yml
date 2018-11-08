@@ -5,6 +5,8 @@ stages:
   - type: git
     branch: ${GIT_BRANCH}
     service: ${GIT_REPO}
+  triggers:
+  - type: commit
   properties:
   - name: DOCKER_ROOT
     value: ${DOCKER_ROOT}
@@ -96,7 +98,7 @@ stages:
     script: |
       #!/bin/bash
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/deploy_kubectl.sh")
-- name: CANARY 0% TRAFFIC
+- name: CANARY DARK
   inputs:
   - type: job
     stage: BUILD
@@ -120,19 +122,7 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
-      echo "CLUSTER_NAMESPACE=${CLUSTER_NAMESPACE}"
-      echo ""
-      echo "DEPLOYING USING MANIFEST:"
-      if [ -z "${DARK_TEST_FILE}" ]; then DARK_TEST_FILE=canary.yml ; fi
-      if [ -f ${DARK_TEST_FILE} ]; then
-          echo "Deploy dark test MANIFEST:"
-          cat ${DARK_TEST_FILE}
-          kubectl replace -f ${DARK_TEST_FILE} --namespace ${CLUSTER_NAMESPACE}
-      else 
-          echo -e "${red}Istio dark test deployment file '${DARK_TEST_FILE}' not found${no_color}"
-          exit 1
-      fi    
-      echo "Provide link to Prometheus/Istio dashboard"
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_virtualservice_canary_dark.sh")
   - name: Functional tests
     type: deployer
     target:
@@ -142,6 +132,7 @@ stages:
     script: |
       #!/bin/bash
       echo "Run some validation tests"
+      echo "Provide link to Prometheus/Istio dashboard"
   - name: Chaos tests
     type: deployer
     target:
@@ -172,17 +163,55 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
-      echo "DEPLOYING USING MANIFEST:"
-      if [ -z "${CANARY_FILE}" ]; then CANARY_FILE=canary.yml ; fi
-      if [ -f ${CANARY_FILE} ]; then
-          echo "Deploy Canary MANIFEST:"
-          cat ${CANARY_FILE}
-          kubectl apply -f ${CANARY_FILE} --namespace ${CLUSTER_NAMESPACE}
-      else 
-          echo -e "${red}Istio Canary deployment file '${CANARY_FILE}' not found${no_color}"
-          exit 1
-      fi
-- name: FINALIZE
+      CANARY_WEIGHT=20
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_virtualservice_canary_weight.sh")
+- name: CANARY 50% TRAFFIC
+  inputs:
+  - type: job
+    stage: BUILD
+    job: Build Docker image
+  properties:
+  - name: buildprops
+    value: build.properties
+    type: file
+  - name: CLUSTER_NAMESPACE
+    value: ${PROD_CLUSTER_NAMESPACE}
+    type: text     
+  jobs:
+  - name: Route 50% traffic
+    type: deployer
+    target:
+      region_id: ${PROD_REGION_ID}
+      api_key: ${API_KEY}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |
+      #!/bin/bash
+      CANARY_WEIGHT=50
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_virtualservice_canary_weight.sh")
+- name: CANARY 100% TRAFFIC
+  inputs:
+  - type: job
+    stage: BUILD
+    job: Build Docker image
+  properties:
+  - name: buildprops
+    value: build.properties
+    type: file
+  - name: CLUSTER_NAMESPACE
+    value: ${PROD_CLUSTER_NAMESPACE}
+    type: text     
+  jobs:
+  - name: Route 100% traffic
+    type: deployer
+    target:
+      region_id: ${PROD_REGION_ID}
+      api_key: ${API_KEY}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |
+      #!/bin/bash
+      CANARY_WEIGHT=100
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_virtualservice_canary_weight.sh")
+- name: CANARY FINALIZE (AFTER MERGE)
   inputs:
   - type: job
     stage: BUILD
@@ -203,14 +232,8 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
-      WORKING_DIR=$(pwd)
-      mkdir ~/tmpbin && cd ~/tmpbin
-      curl -L https://git.io/getLatestIstio | sh -
-      ISTIO_BIN=$(find istio*/bin -maxdepth 0 -type d)
-      export PATH=${ISTIO_BIN}:$PATH
-      cd $WORKING_DIR
-      #kubectl apply -f install/kubernetes/istio.yaml
-      echo "Provide link to Prometheus/Istio dashboard"
+      CANARY_WEIGHT=0
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_virtualservice_canary_weight.sh")
   - name: Discard canary deploy
     type: deployer
     target:
@@ -219,11 +242,4 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
-      WORKING_DIR=$(pwd)
-      mkdir ~/tmpbin && cd ~/tmpbin
-      curl -L https://git.io/getLatestIstio | sh -
-      ISTIO_BIN=$(find istio*/bin -maxdepth 0 -type d)
-      export PATH=${ISTIO_BIN}:$PATH
-      cd $WORKING_DIR
-      #kubectl apply -f install/kubernetes/istio.yaml
-      echo "Provide link to Prometheus/Istio dashboard"
+      echo "delete canary deployment"
