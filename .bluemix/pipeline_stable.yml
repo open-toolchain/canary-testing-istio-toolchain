@@ -88,8 +88,8 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_istio.sh")
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/config_istio_canary.sh")
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_check_install.sh")
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_config_canary.sh")
   - name: Pre-deploy check
     type: deployer
     target:
