@@ -104,7 +104,7 @@ stages:
         kubectl apply -f redis-master-deployment.yaml --namespace ${CLUSTER_NAMESPACE}
         kubectl apply -f redis-master-service.yaml --namespace ${CLUSTER_NAMESPACE}
       fi
-      REDIS_SLAVE=$( kubectl get deployments  --namespace ${CLUSTER_NAMESPACE}-o json | jq -r '.items[].metadata | select (.name=="redis-slave") | .name ' )
+      REDIS_SLAVE=$( kubectl get deployments --namespace ${CLUSTER_NAMESPACE} -o json | jq -r '.items[].metadata | select (.name=="redis-slave") | .name ' )
       if [ -z "${REDIS_SLAVE}" ]; then
         kubectl apply -f redis-slave-deployment.yaml --namespace ${CLUSTER_NAMESPACE}
         kubectl apply -f redis-slave-service.yaml --namespace ${CLUSTER_NAMESPACE}
@@ -127,4 +127,4 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/deploy_kubectl.sh")
+      #source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/deploy_kubectl.sh")
