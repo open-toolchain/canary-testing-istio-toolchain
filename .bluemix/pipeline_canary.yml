@@ -97,6 +97,12 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
+      # Install 'yq' to process yaml files
+      python -m site &> /dev/null && export PATH="$PATH:`python -m site --user-base`/bin"
+      pip install yq
+      echo -e "Updating $DEPLOYMENT_FILE to represent canary deployment: add label version, modify deployment name" 
+      cat $DEPLOYMENT_FILE | yq --yaml-output --arg l canary --arg n ${IMAGE_NAME}-canary '. | select(.kind=="Deployment") | .metadata.labels.version = $l | .metadata.name = $n ' > $DEPLOYMENT_FILE
+      cat $DEPLOYMENT_FILE
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/deploy_kubectl.sh")
 - name: CANARY DARK
   inputs:
@@ -142,29 +148,6 @@ stages:
     script: |
       #!/bin/bash
       echo "Run some chaos tests"
-- name: CANARY 20% TRAFFIC
-  inputs:
-  - type: job
-    stage: BUILD
-    job: Build Docker image
-  properties:
-  - name: buildprops
-    value: build.properties
-    type: file
-  - name: CLUSTER_NAMESPACE
-    value: ${PROD_CLUSTER_NAMESPACE}
-    type: text     
-  jobs:
-  - name: Route 20% traffic
-    type: deployer
-    target:
-      region_id: ${PROD_REGION_ID}
-      api_key: ${API_KEY}
-      kubernetes_cluster: ${PROD_CLUSTER_NAME}
-    script: |
-      #!/bin/bash
-      CANARY_WEIGHT=20
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_virtualservice_canary_weight.sh")
 - name: CANARY 50% TRAFFIC
   inputs:
   - type: job
@@ -224,16 +207,6 @@ stages:
     value: ${PROD_CLUSTER_NAMESPACE}
     type: text     
   jobs:
-  - name: Route 0% traffic
-    type: deployer
-    target:
-      region_id: ${PROD_REGION_ID}
-      api_key: ${API_KEY}
-      kubernetes_cluster: ${PROD_CLUSTER_NAME}
-    script: |
-      #!/bin/bash
-      CANARY_WEIGHT=0
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_virtualservice_canary_weight.sh")
   - name: Discard canary deploy
     type: deployer
     target:
@@ -242,4 +215,8 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
-      echo "delete canary deployment"
+      echo "Stop routing traffic"
+      CANARY_WEIGHT=0
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_virtualservice_canary_weight.sh")
+      echo "Delete canary deployment"
+      kubectl delete deployment ${IMAGE_NAME}-canary --namespace ${CLUSTER_NAMESPACE}
