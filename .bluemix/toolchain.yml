@@ -30,7 +30,7 @@ services:
       type: clone
       has_issues: true
       enable_traceability: true
-  build_a:
+  build_stable:
     service_id: pipeline
     parameters:
       services:
@@ -53,7 +53,7 @@ services:
           PROD_CLUSTER_NAME: '{{form.pipeline.parameters.prod-cluster-name}}'
           PROD_CLUSTER_NAMESPACE: '{{form.pipeline.parameters.prod-cluster-namespace}}'
         execute: true
-  build_b:
+  build_canary:
     service_id: pipeline
     parameters:
       services:
@@ -65,7 +65,7 @@ services:
           $text: pipeline_canary.yml
         env:
           GIT_REPO: repo
-          GIT_BRANCH: next
+          GIT_BRANCH: canary
           DOCKER_ROOT: guestbook
           DEPLOYMENT_FILE: guestbook-deployment.yaml
           CF_APP_NAME: '{{form.pipeline.parameters.app-name}}'
