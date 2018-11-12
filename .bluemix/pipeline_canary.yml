@@ -100,9 +100,12 @@ stages:
       # Install 'yq' to process yaml files
       python -m site &> /dev/null && export PATH="$PATH:`python -m site --user-base`/bin"
       pip install yq
-      echo -e "Updating $DEPLOYMENT_FILE to represent canary deployment: add label version, modify deployment name" 
-      cat $DEPLOYMENT_FILE | yq --yaml-output --arg l canary --arg n ${IMAGE_NAME}-canary '. | select(.kind=="Deployment") | .metadata.labels.version = $l | .metadata.name = $n ' > $DEPLOYMENT_FILE
-      cat $DEPLOYMENT_FILE
+      echo -e "Updating $DEPLOYMENT_FILE to represent canary deployment: add label version, modify deployment name"
+      CANARY_DEPLOYMENT_FILE=canary-${DEPLOYMENT_FILE} # prefix original deployment file name
+      DEPLOYMENT_NAME=$( cat ${DEPLOYMENT_FILE} | yq -r '. | select(.kind=="Deployment") | .metadata.name' ) # read deployment name
+      cat ${DEPLOYMENT_FILE} | yq --yaml-output --arg l canary --arg n ${DEPLOYMENT_NAME}-canary '. | select(.kind=="Deployment") | .metadata.labels.version = $l | .spec.template.metadata.labels.version = $l | .metadata.name = $n ' > ${CANARY_DEPLOYMENT_FILE}
+      DEPLOYMENT_FILE=${CANARY_DEPLOYMENT_FILE} # replace original deployment file
+      cat ${DEPLOYMENT_FILE}
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/deploy_kubectl.sh")
 - name: CANARY DARK
   inputs:
