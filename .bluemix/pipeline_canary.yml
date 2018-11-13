@@ -62,7 +62,7 @@ stages:
     script: |
       #!/bin/bash
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_vulnerabilities.sh")
-- name: DEPLOY CANARY
+- name: CANARY DEPLOY
   inputs:
   - type: job
     stage: BUILD
@@ -89,7 +89,7 @@ stages:
     script: |
       #!/bin/bash
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_predeploy_kubectl.sh")
-  - name: Deploy dark
+  - name: Deploy to Kubernetes
     type: deployer
     target:
       region_id: ${PROD_REGION_ID}
@@ -119,7 +119,7 @@ stages:
   - name: CLUSTER_NAMESPACE
     value: ${PROD_CLUSTER_NAMESPACE}
     type: text
-  - name: DARK_TEST_FILE
+  - name: VIRTUAL_SERVICE_FILE
     value: virtualservice-test.yaml
     type: text  
   jobs:
@@ -162,7 +162,10 @@ stages:
     type: file
   - name: CLUSTER_NAMESPACE
     value: ${PROD_CLUSTER_NAMESPACE}
-    type: text     
+    type: text
+  - name: VIRTUAL_SERVICE_FILE
+    value: virtualservice-test.yaml
+    type: text
   jobs:
   - name: Route 50% traffic
     type: deployer
@@ -185,7 +188,10 @@ stages:
     type: file
   - name: CLUSTER_NAMESPACE
     value: ${PROD_CLUSTER_NAMESPACE}
-    type: text     
+    type: text
+  - name: VIRTUAL_SERVICE_FILE
+    value: virtualservice-test.yaml
+    type: text
   jobs:
   - name: Route 100% traffic
     type: deployer
@@ -208,7 +214,10 @@ stages:
     type: file
   - name: CLUSTER_NAMESPACE
     value: ${PROD_CLUSTER_NAMESPACE}
-    type: text     
+    type: text
+  - name: VIRTUAL_SERVICE_FILE
+    value: virtualservice-test.yaml
+    type: text    
   jobs:
   - name: Discard canary deploy
     type: deployer
