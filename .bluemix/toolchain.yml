@@ -35,7 +35,7 @@ services:
     parameters:
       services:
         - repo
-      name: 'STABLE-{{services.repo.parameters.repo_name}}'
+      name: 'stable'
       ui-pipeline: true
       configuration:
         content:
@@ -58,7 +58,7 @@ services:
     parameters:
       services:
         - repo
-      name: 'CANARY-{{services.repo.parameters.repo_name}}'
+      name: 'canary'
       ui-pipeline: true
       configuration:
         content:

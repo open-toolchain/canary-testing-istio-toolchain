@@ -22,3 +22,4 @@ Any code change to the Git repo will automatically be built, validated and deplo
 * [Getting started with Bluemix clusters](https://console.bluemix.net/docs/containers/container_index.html?pos=2)
 * [Getting started with toolchains](https://bluemix.net/devops/getting-started)
 * [Documentation](https://console.bluemix.net/docs/services/ContinuousDelivery/index.html?pos=2)
+* [Istio workshop](https://github.com/IBM/istio101/tree/master/workshop)

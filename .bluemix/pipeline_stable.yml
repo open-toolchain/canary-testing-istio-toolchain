@@ -80,16 +80,6 @@ stages:
     value: ${DEPLOYMENT_FILE}
     type: text      
   jobs:
-  - name: Check Istio config
-    type: deployer
-    target:
-      region_id: ${PROD_REGION_ID}
-      api_key: ${API_KEY}
-      kubernetes_cluster: ${PROD_CLUSTER_NAME}
-    script: |
-      #!/bin/bash
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_check_install.sh")
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_config_canary.sh")
   - name: Pre-deploy check
     type: deployer
     target:
@@ -110,6 +100,16 @@ stages:
         kubectl apply -f redis-slave-service.yaml --namespace ${CLUSTER_NAMESPACE}
       fi
       # TODO - add waiting loop for redis initial provisioning
+  - name: Check Istio config
+    type: deployer
+    target:
+      region_id: ${PROD_REGION_ID}
+      api_key: ${API_KEY}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |
+      #!/bin/bash
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_check_install.sh")
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_config_canary.sh")
   - name: Deploy to Kubernetes
     type: deployer
     target:
@@ -118,4 +118,5 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
+      USE_ISTIO_GATEWAY=true
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/deploy_kubectl.sh")
