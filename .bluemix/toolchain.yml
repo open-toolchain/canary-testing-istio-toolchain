@@ -82,6 +82,6 @@ form:
   pipeline:
     parameters:
       app-name: '{{services.repo.parameters.repo_name}}'
-      prod-cluster-namespace: prod
+      prod-cluster-namespace: istio-prod
     schema:
       $ref: deploy.json
