@@ -1,4 +1,8 @@
 ---
+properties:
+- name: DEPLOYMENT_FILE
+  value: ${DEPLOYMENT_FILE}
+  type: text
 stages:
 - name: BUILD
   inputs:
@@ -75,10 +79,7 @@ stages:
     type: file
   - name: CLUSTER_NAMESPACE
     value: ${PROD_CLUSTER_NAMESPACE}
-    type: text
-  - name: DEPLOYMENT_FILE
-    value: ${DEPLOYMENT_FILE}
-    type: text      
+    type: text    
   jobs:
   - name: Pre-deploy check
     type: deployer
@@ -109,7 +110,7 @@ stages:
       cat ${DEPLOYMENT_FILE}
       USE_ISTIO_GATEWAY=true
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/deploy_kubectl.sh")
-- name: CANARY DARK
+- name: CANARY DARK LAUNCH
   inputs:
   - type: job
     stage: BUILD
@@ -122,10 +123,10 @@ stages:
     value: ${PROD_CLUSTER_NAMESPACE}
     type: text
   - name: VIRTUAL_SERVICE_FILE
-    value: virtualservice-test.yaml
+    value: virtualservice-canary-dark.yaml
     type: text  
   jobs:
-  - name: Route 0% traffic
+  - name: Dark launch (FF)
     type: deployer
     target:
       region_id: ${PROD_REGION_ID}
@@ -179,32 +180,6 @@ stages:
       #!/bin/bash
       CANARY_WEIGHT=50
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_virtualservice_canary_weight.sh")
-- name: CANARY 100% TRAFFIC
-  inputs:
-  - type: job
-    stage: BUILD
-    job: Build Docker image
-  properties:
-  - name: buildprops
-    value: build.properties
-    type: file
-  - name: CLUSTER_NAMESPACE
-    value: ${PROD_CLUSTER_NAMESPACE}
-    type: text
-  - name: VIRTUAL_SERVICE_FILE
-    value: virtualservice-test.yaml
-    type: text
-  jobs:
-  - name: Route 100% traffic
-    type: deployer
-    target:
-      region_id: ${PROD_REGION_ID}
-      api_key: ${API_KEY}
-      kubernetes_cluster: ${PROD_CLUSTER_NAME}
-    script: |
-      #!/bin/bash
-      CANARY_WEIGHT=100
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_virtualservice_canary_weight.sh")
 - name: CANARY FINALIZE (AFTER MERGE)
   inputs:
   - type: job
@@ -221,6 +196,16 @@ stages:
     value: virtualservice-test.yaml
     type: text    
   jobs:
+  - name: Stop canary traffic
+    type: deployer
+    target:
+      region_id: ${PROD_REGION_ID}
+      api_key: ${API_KEY}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |
+      #!/bin/bash
+      echo "Stop routing traffic to 'canary' destination"
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_virtualservice_stable.sh")
   - name: Discard canary deploy
     type: deployer
     target:
@@ -229,8 +214,10 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
-      echo "Stop routing traffic"
-      CANARY_WEIGHT=0
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_virtualservice_canary_weight.sh")
+      # Install 'yq' to process yaml files
+      python -m site &> /dev/null && export PATH="$PATH:`python -m site --user-base`/bin"
+      pip install yq
+      # read app name if present, if not default to deployment name
+      DEPLOYMENT_NAME=$( cat ${DEPLOYMENT_FILE} | yq -r '. | select(.kind=="Deployment") | .metadata.name' ) # read deployment name
       echo "Delete canary deployment"
-      kubectl delete deployment ${IMAGE_NAME}-canary --namespace ${CLUSTER_NAMESPACE}
+      kubectl delete deployment ${DEPLOYMENT_NAME}-canary --namespace ${CLUSTER_NAMESPACE}

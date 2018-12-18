@@ -1,4 +1,8 @@
 ---
+properties:
+- name: DEPLOYMENT_FILE
+  value: ${DEPLOYMENT_FILE}
+  type: text
 stages:
 - name: BUILD
   inputs:
@@ -76,9 +80,6 @@ stages:
   - name: CLUSTER_NAMESPACE
     value: ${PROD_CLUSTER_NAMESPACE}
     type: text
-  - name: DEPLOYMENT_FILE
-    value: ${DEPLOYMENT_FILE}
-    type: text      
   jobs:
   - name: Pre-deploy check
     type: deployer
