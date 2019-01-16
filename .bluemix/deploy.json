@@ -42,6 +42,13 @@
             "type": "string",
             "disabled": false
         },
+        "prod-resource-group": {
+            "description": {
+              "$ref" : "#/messages/deploy.resourceGroupDescription"
+            },
+            "type": "string",
+            "pattern": "\\S"
+        },
        "prod-cluster-name": {
             "description": {
               "$ref" : "#/messages/deploy.clusterNameDescription"
@@ -64,7 +71,7 @@
             "pattern": "\\S"
         }
     },
-    "required": ["app-name", "api-key", "registry-region", "registry-namespace", "prod-region", "prod-cluster-name", "prod-cluster-namespace"],
+    "required": ["app-name", "canary-branch", "api-key", "registry-region", "registry-namespace", "prod-region", "prod-resource-group", "prod-cluster-name", "prod-cluster-namespace"],
     "form": [
        {
           "type": "validator",
@@ -123,7 +130,7 @@
         },{
             "type": "table",
             "columnCount": 5,
-            "widths": ["32%","2%","32%", "2%", "32%"],
+            "widths": ["22%","2%","22%", "2%", "22%", "2%", "22%"],
             "items": [
                 {
                   "type": "label",
@@ -133,8 +140,15 @@
                 },{
                   "type": "label",
                   "title": ""
-                },
-                {
+                },{
+                  "type": "label",
+                  "title": {
+                    "$ref": "#/messages/deploy.resourceGroup"
+                  }
+                },{                  
+                  "type": "label",
+                  "title": ""
+                },{
                   "type": "label",
                   "title": {
                     "$ref": "#/messages/deploy.cluster"
@@ -142,8 +156,7 @@
                 },{
                   "type": "label",
                   "title": ""
-                },
-                {
+                },{
                   "type": "label",
                   "title": {
                     "$ref": "#/messages/deploy.clusterNs"
@@ -154,16 +167,21 @@
                 },{
                   "type": "label",
                   "title": ""
-                },
-                {
+                },{
+                  "type": "select",
+                  "key": "prod-resource-group",
+                  "readonly": false
+                },{
+                  "type": "label",
+                  "title": ""
+                },{
                   "type": "select",
                   "key": "prod-cluster-name",
                   "readonly": false
                 },{
                   "type": "label",
                   "title": ""
-                },
-                {
+                },{
                   "type": "text",
                   "key": "prod-cluster-namespace",
                   "readonly": false

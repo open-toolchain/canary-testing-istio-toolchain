@@ -84,8 +84,9 @@ stages:
   - name: Pre-deploy check
     type: deployer
     target:
-      region_id: ${PROD_REGION_ID}
       api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
@@ -93,8 +94,9 @@ stages:
   - name: Deploy to Kubernetes
     type: deployer
     target:
-      region_id: ${PROD_REGION_ID}
       api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
@@ -129,8 +131,9 @@ stages:
   - name: Dark launch (FF)
     type: deployer
     target:
-      region_id: ${PROD_REGION_ID}
       api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
@@ -138,8 +141,9 @@ stages:
   - name: Functional tests
     type: deployer
     target:
-      region_id: ${PROD_REGION_ID}
       api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
@@ -148,8 +152,9 @@ stages:
   - name: Chaos tests
     type: deployer
     target:
-      region_id: ${PROD_REGION_ID}
       api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
@@ -173,8 +178,9 @@ stages:
   - name: Route 50% traffic
     type: deployer
     target:
-      region_id: ${PROD_REGION_ID}
       api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
@@ -199,8 +205,9 @@ stages:
   - name: Stop canary traffic
     type: deployer
     target:
-      region_id: ${PROD_REGION_ID}
       api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash

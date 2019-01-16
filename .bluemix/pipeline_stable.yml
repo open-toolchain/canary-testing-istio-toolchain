@@ -84,8 +84,9 @@ stages:
   - name: Pre-deploy check
     type: deployer
     target:
-      region_id: ${PROD_REGION_ID}
       api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
@@ -104,8 +105,9 @@ stages:
   - name: Check Istio config
     type: deployer
     target:
-      region_id: ${PROD_REGION_ID}
       api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
@@ -114,8 +116,9 @@ stages:
   - name: Deploy to Kubernetes
     type: deployer
     target:
-      region_id: ${PROD_REGION_ID}
       api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
