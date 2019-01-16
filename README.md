@@ -1,18 +1,18 @@
 # ![Icon](./.bluemix/istio-logo.png) Canary testing in Kubernetes using Istio
 
 ### Develop and canary test your Kubernetes application using Istio
-The sample application uses Docker with Node.js and includes a DevOps toolchain that is preconfigured for canary testing, continuous delivery with Vulnerability Advisor, source control, issue tracking, and online editing, and deployment to the IBM Cloud Kubernetes Service.
+The sample application is using Docker and Go and is adapted from [guestbook](https://github.com/IBM/guestbook). It includes a DevOps toolchain that is preconfigured for canary testing (branch 'canary'), continuous delivery with Vulnerability Advisor, source control, issue tracking, and online editing, and deployment to the IBM Cloud Kubernetes Service.
 
 Application code is stored in source control, along with its Dockerfile and its Kubernetes deployment script.
-The target cluster is configured during toolchain setup (using an IBM Cloud API key and cluster name). You can later change these by altering the Delivery Pipeline configuration.
-Any code change to the Git repo will automatically be built, validated and deployed into the Kubernetes cluster.
-
+The target cluster is configured during toolchain setup (using an IBM Cloud API key and cluster name). You can later change these by modifying the Delivery Pipeline configuration.
+Any code change to the master branch in the Git repo will automatically be built, validated and deployed into the Kubernetes cluster.
+Changes to the `canary` branch will be rolled out in parallel, leveraging istio traffic management abilitiy.
 ![Icon](./.bluemix/toolchain.png)
 
 
 
 ### To get started, click this button:
-[![Create Toolchain](https://console.bluemix.net/devops/graphics/create_toolchain_button.png)](https://console.bluemix.net/devops/setup/deploy/?repository=https%3A//github.com/open-toolchain/canary-testing-istio-toolchain)
+[![Create Toolchain](https://console.bluemix.net/devops/graphics/create_toolchain_button.png)](https://console.bluemix.net/devops/setup/deploy/?repository=https%3A//github.com/open-toolchain/canary-testing-istio-toolchain&env_id=ibm:yp:eu-de)
 
 ---
 ### Learn more 
