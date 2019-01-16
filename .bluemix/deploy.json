@@ -129,7 +129,7 @@
             ]
         },{
             "type": "table",
-            "columnCount": 5,
+            "columnCount": 7,
             "widths": ["21%","1%","21%", "1%", "21%", "1%", "21%"],
             "items": [
                 {
