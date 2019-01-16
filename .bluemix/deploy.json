@@ -71,7 +71,7 @@
             "pattern": "\\S"
         }
     },
-    "required": ["app-name", "canary-branch", "api-key", "registry-region", "registry-namespace", "prod-region", "prod-resource-group", "prod-cluster-name", "prod-cluster-namespace"],
+    "required": ["app-name", "api-key", "registry-region", "registry-namespace", "prod-region", "prod-resource-group", "prod-cluster-name", "prod-cluster-namespace"],
     "form": [
        {
           "type": "validator",
