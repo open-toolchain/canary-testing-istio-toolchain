@@ -168,7 +168,7 @@
                   "type": "label",
                   "title": ""
                 },{
-                  "type": "select",
+                  "type": "text",
                   "key": "prod-resource-group",
                   "readonly": false
                 },{
