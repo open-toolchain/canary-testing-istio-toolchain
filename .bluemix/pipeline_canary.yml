@@ -112,7 +112,7 @@ stages:
       cat ${DEPLOYMENT_FILE}
       USE_ISTIO_GATEWAY=true
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/deploy_kubectl.sh")
-- name: DARK LAUNCH
+- name: CANARY DARK
   inputs:
   - type: job
     stage: BUILD
@@ -162,7 +162,7 @@ stages:
     script: |
       #!/bin/bash
       echo "Run some chaos tests"
-- name: CANARY 50% TRAFFIC
+- name: CANARY 50%
   inputs:
   - type: job
     stage: BUILD
