@@ -77,6 +77,9 @@ stages:
   - name: buildprops
     value: build.properties
     type: file
+  - name: HELM_VERSION
+    value: ''
+    type: text
   - name: CLUSTER_NAMESPACE
     value: ${PROD_CLUSTER_NAMESPACE}
     type: text    
