@@ -9,10 +9,21 @@ Any code change to the master branch in the Git repo will automatically be built
 Changes to the `canary` branch will be rolled out in parallel, leveraging istio traffic management abilitiy.
 ![Icon](./.bluemix/toolchain.png)
 
-
-
 ### To get started, click this button:
 [![Create Toolchain](https://console.bluemix.net/devops/graphics/create_toolchain_button.png)](https://console.bluemix.net/devops/setup/deploy/?repository=https%3A//github.com/open-toolchain/canary-testing-istio-toolchain&env_id=ibm:yp:eu-de)
+
+### Steps
+
+Learn how to canary test an application using Istio using 2 branches: 
+* master for mainstream development and rollout of new versions (or emergency fixes)
+* canary branch for A/B testing a long lasting feature branch.
+
+* At the beginning of the scenario, you have master pipeline deploy to prod with application "v1".
+* View the `stable` pipeline execution, find the deployed application (log in deploy stage) 
+* Switch to developing feature in canary branch. Canary branch is already up in repo, with a tiny code change (just updated header to "v2"), but could further enhance it at will.
+* Deploy the canary by triggering the `canary` pipeline. Will build and deploy the application in parallel of the master one, modifying the deployment manifests automatically, without needing developer to manage multiple versions, and configuring Istio routing rules for user (visible in the logs)
+* Dark deployment is configuring the routing to only expose the canary app to Firefox users, next stage deploy is exposing the canary to 50% user.
+* Once happy with the new behavior, create a pull request from canary->master, run the last stage (finalize) to collapse the canary launch, as the feature got merged into the master branch and redeployed properly.
 
 ---
 ### Learn more 
