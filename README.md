@@ -10,7 +10,7 @@ Changes to the `canary` branch will be rolled out in parallel, leveraging istio 
 ![Icon](./.bluemix/toolchain.png)
 
 ### To get started, click this button:
-[![Create Toolchain](https://console.bluemix.net/devops/graphics/create_toolchain_button.png)](https://console.bluemix.net/devops/setup/deploy/?repository=https%3A//github.com/open-toolchain/canary-testing-istio-toolchain&env_id=ibm:yp:eu-de)
+[![Create Toolchain](https://cloud.ibm.com/devops/graphics/create_toolchain_button.png)](https://cloud.ibm.com/devops/setup/deploy/?repository=https%3A//github.com/open-toolchain/canary-testing-istio-toolchain&env_id=ibm:yp:eu-de)
 
 ### Steps
 
@@ -30,7 +30,7 @@ Learn how to canary test an application using Istio using 2 branches:
 
 * Blog [Continuously deliver your app to Kubernetes with Bluemix](https://www.ibm.com/blogs/bluemix/2017/07/continuously-deliver-your-app-to-kubernetes-with-bluemix/)
 * Step by step [tutorial](https://www.ibm.com/devops/method/tutorials/tc_secure_kube)
-* [Getting started with Bluemix clusters](https://console.bluemix.net/docs/containers/container_index.html?pos=2)
+* [Getting started with Bluemix clusters](https://cloud.ibm.com/docs/containers/container_index.html?pos=2)
 * [Getting started with toolchains](https://bluemix.net/devops/getting-started)
-* [Documentation](https://console.bluemix.net/docs/services/ContinuousDelivery/index.html?pos=2)
+* [Documentation](https://cloud.ibm.com/docs/services/ContinuousDelivery/index.html?pos=2)
 * [Istio workshop](https://github.com/IBM/istio101/tree/master/workshop)
