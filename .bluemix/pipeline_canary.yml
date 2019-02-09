@@ -30,7 +30,7 @@ stages:
     image_name: ${CF_APP_NAME}
     script: |-
       #!/bin/bash
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_prebuild.sh")
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_prebuild.sh")
   - name: Build Docker image
     type: builder
     build_type: cr
@@ -42,7 +42,7 @@ stages:
     image_name: ${CF_APP_NAME}
     script: |
       #!/bin/bash
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/build_image.sh")
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/build_image.sh")
 - name: VALIDATE
   inputs:
   - type: job
@@ -65,8 +65,8 @@ stages:
       api_key: ${API_KEY}
     script: |
       #!/bin/bash
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_vulnerabilities.sh")
-- name: CANARY DEPLOY
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_vulnerabilities.sh")
+- name: DEPLOY
   inputs:
   - type: job
     stage: BUILD
@@ -84,17 +84,19 @@ stages:
   - name: Pre-deploy check
     type: deployer
     target:
-      region_id: ${PROD_REGION_ID}
       api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/check_predeploy_kubectl.sh")
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_predeploy_kubectl.sh")
   - name: Deploy to Kubernetes
     type: deployer
     target:
-      region_id: ${PROD_REGION_ID}
       api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
@@ -109,82 +111,15 @@ stages:
       DEPLOYMENT_FILE=${CANARY_DEPLOYMENT_FILE} # replace original deployment file
       cat ${DEPLOYMENT_FILE}
       USE_ISTIO_GATEWAY=true
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/deploy_kubectl.sh")
-- name: CANARY DARK LAUNCH
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/deploy_kubectl.sh")
+- name: CANARY 0%
   inputs:
   - type: job
     stage: BUILD
     job: Build Docker image
-  properties:
-  - name: buildprops
-    value: build.properties
-    type: file
-  - name: CLUSTER_NAMESPACE
-    value: ${PROD_CLUSTER_NAMESPACE}
-    type: text
-  - name: VIRTUAL_SERVICE_FILE
-    value: virtualservice-canary-dark.yaml
-    type: text  
-  jobs:
-  - name: Dark launch (FF)
-    type: deployer
-    target:
-      region_id: ${PROD_REGION_ID}
-      api_key: ${API_KEY}
-      kubernetes_cluster: ${PROD_CLUSTER_NAME}
-    script: |
-      #!/bin/bash
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_virtualservice_canary_dark.sh")
-  - name: Functional tests
-    type: deployer
-    target:
-      region_id: ${PROD_REGION_ID}
-      api_key: ${API_KEY}
-      kubernetes_cluster: ${PROD_CLUSTER_NAME}
-    script: |
-      #!/bin/bash
-      echo "Run some validation tests"
-      echo "Provide link to Prometheus/Istio dashboard"
-  - name: Chaos tests
-    type: deployer
-    target:
-      region_id: ${PROD_REGION_ID}
-      api_key: ${API_KEY}
-      kubernetes_cluster: ${PROD_CLUSTER_NAME}
-    script: |
-      #!/bin/bash
-      echo "Run some chaos tests"
-- name: CANARY 50% TRAFFIC
-  inputs:
-  - type: job
-    stage: BUILD
-    job: Build Docker image
-  properties:
-  - name: buildprops
-    value: build.properties
-    type: file
-  - name: CLUSTER_NAMESPACE
-    value: ${PROD_CLUSTER_NAMESPACE}
-    type: text
-  - name: VIRTUAL_SERVICE_FILE
-    value: virtualservice-test.yaml
-    type: text
-  jobs:
-  - name: Route 50% traffic
-    type: deployer
-    target:
-      region_id: ${PROD_REGION_ID}
-      api_key: ${API_KEY}
-      kubernetes_cluster: ${PROD_CLUSTER_NAME}
-    script: |
-      #!/bin/bash
-      CANARY_WEIGHT=50
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_virtualservice_canary_weight.sh")
-- name: CANARY FINALIZE (AFTER MERGE)
-  inputs:
-  - type: job
-    stage: BUILD
-    job: Build Docker image
+  triggers:
+    - type: stage
+      enabled: false
   properties:
   - name: buildprops
     value: build.properties
@@ -199,13 +134,124 @@ stages:
   - name: Stop canary traffic
     type: deployer
     target:
-      region_id: ${PROD_REGION_ID}
       api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
       echo "Stop routing traffic to 'canary' destination"
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/next/scripts/istio_virtualservice_stable.sh")
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_stable.sh")
+- name: CANARY DARK
+  inputs:
+  - type: job
+    stage: BUILD
+    job: Build Docker image
+  triggers:
+    - type: stage
+      enabled: false
+  properties:
+  - name: buildprops
+    value: build.properties
+    type: file
+  - name: CLUSTER_NAMESPACE
+    value: ${PROD_CLUSTER_NAMESPACE}
+    type: text
+  - name: VIRTUAL_SERVICE_FILE
+    value: virtualservice-canary-dark.yaml
+    type: text  
+  jobs:
+  - name: Dark launch (FF)
+    type: deployer
+    target:
+      api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |
+      #!/bin/bash
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_canary_dark.sh")
+  - name: Functional tests
+    type: deployer
+    target:
+      api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |
+      #!/bin/bash
+      echo "Run some validation tests"
+      echo "Provide link to Prometheus/Istio dashboard"
+  - name: Chaos tests
+    type: deployer
+    target:
+      api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |
+      #!/bin/bash
+      echo "Run some chaos tests"
+- name: CANARY 50%
+  inputs:
+  - type: job
+    stage: BUILD
+    job: Build Docker image
+  triggers:
+    - type: stage
+      enabled: false
+  properties:
+  - name: buildprops
+    value: build.properties
+    type: file
+  - name: CLUSTER_NAMESPACE
+    value: ${PROD_CLUSTER_NAMESPACE}
+    type: text
+  - name: VIRTUAL_SERVICE_FILE
+    value: virtualservice-test.yaml
+    type: text
+  jobs:
+  - name: Route 50% traffic
+    type: deployer
+    target:
+      api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |
+      #!/bin/bash
+      CANARY_WEIGHT=50
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_canary_weight.sh")
+- name: CANARY FINALIZE (AFTER MERGE)
+  inputs:
+  - type: job
+    stage: BUILD
+    job: Build Docker image
+  triggers:
+    - type: stage
+      enabled: false
+  properties:
+  - name: buildprops
+    value: build.properties
+    type: file
+  - name: CLUSTER_NAMESPACE
+    value: ${PROD_CLUSTER_NAMESPACE}
+    type: text
+  - name: VIRTUAL_SERVICE_FILE
+    value: virtualservice-test.yaml
+    type: text    
+  jobs:
+  - name: Stop canary traffic
+    type: deployer
+    target:
+      api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |
+      #!/bin/bash
+      echo "Stop routing traffic to 'canary' destination"
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_stable.sh")
   - name: Discard canary deploy
     type: deployer
     target:
