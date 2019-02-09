@@ -77,9 +77,6 @@ stages:
   - name: buildprops
     value: build.properties
     type: file
-  - name: HELM_VERSION
-    value: ''
-    type: text
   - name: CLUSTER_NAMESPACE
     value: ${PROD_CLUSTER_NAMESPACE}
     type: text    
@@ -115,6 +112,36 @@ stages:
       cat ${DEPLOYMENT_FILE}
       USE_ISTIO_GATEWAY=true
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/deploy_kubectl.sh")
+- name: CANARY 0%
+  inputs:
+  - type: job
+    stage: BUILD
+    job: Build Docker image
+  triggers:
+    - type: stage
+      enabled: false
+  properties:
+  - name: buildprops
+    value: build.properties
+    type: file
+  - name: CLUSTER_NAMESPACE
+    value: ${PROD_CLUSTER_NAMESPACE}
+    type: text
+  - name: VIRTUAL_SERVICE_FILE
+    value: virtualservice-test.yaml
+    type: text    
+  jobs:
+  - name: Stop canary traffic
+    type: deployer
+    target:
+      api_key: ${API_KEY}
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |
+      #!/bin/bash
+      echo "Stop routing traffic to 'canary' destination"
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_stable.sh")
 - name: CANARY DARK
   inputs:
   - type: job
