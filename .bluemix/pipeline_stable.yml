@@ -30,6 +30,14 @@ stages:
     image_name: ${CF_APP_NAME}
     script: |-
       #!/bin/bash
+      # uncomment to debug the script
+      # set -x
+      # copy the script below into your app code repo (e.g. ./scripts/check_prebuild.sh) and 'source' it from your pipeline job
+      #    source ./scripts/check_prebuild.sh
+      # alternatively, you can source it from online script:
+      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_prebuild.sh")
+
+      # Lints Dockerfile and checks presence of registry namespace.
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_prebuild.sh")
   - name: Build Docker image
     type: builder
@@ -42,6 +50,16 @@ stages:
     image_name: ${CF_APP_NAME}
     script: |
       #!/bin/bash
+      # uncomment to debug the script
+      #set -x
+      # copy the script below into your app code repo (e.g. ./scripts/build_image.sh) and 'source' it from your pipeline job
+      #    source ./scripts/build_image.sh
+      # alternatively, you can source it from online script:
+      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/build_image.sh")
+
+      # This script does build a Docker image into IBM Container Service private image registry.
+      # Minting image tag using format: BUILD_NUMBER-BRANCH-COMMIT_ID-TIMESTAMP
+      # Also copies information into a build.properties file, so they can be reused later on by other scripts (e.g. image url, chart name, ...)
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/build_image.sh")
 - name: VALIDATE
   inputs:
@@ -65,6 +83,14 @@ stages:
       api_key: ${API_KEY}
     script: |
       #!/bin/bash
+      # uncomment to debug the script
+      # set -x
+      # copy the script below into your app code repo (e.g. ./scripts/check_vulnerabilities.sh) and 'source' it from your pipeline job
+      #    source ./scripts/check_vulnerabilities.sh
+      # alternatively, you can source it from online script:
+      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_vulnerabilities.sh")
+
+      # Check for vulnerabilities of built image using Vulnerability Advisor
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_vulnerabilities.sh")
 - name: PROD
   inputs:
@@ -83,6 +109,9 @@ stages:
   - name: CLUSTER_NAMESPACE
     value: ${PROD_CLUSTER_NAMESPACE}
     type: text
+  - name: APP_URL
+    value: undefined
+    type: text   
   jobs:
   - name: Pre-deploy check
     type: deployer
@@ -93,7 +122,17 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
+      # uncomment to debug the script
+      #set -x
+      # copy the script below into your app code repo (e.g. ./scripts/check_predeploy.sh) and 'source' it from your pipeline job
+      #    source ./scripts/check_predeploy_kubectl.sh
+      # alternatively, you can source it from online script:
+      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_predeploy_kubectl.sh")
+
+      # Checks the cluster is ready, has a namespace configured with access to the private
+      # image registry (using an IBM Cloud API Key). It also configures Helm Tiller service to later perform a deploy with Helm.
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_predeploy_kubectl.sh")
+      # Provision Redis when missing
       REDIS_MASTER=$( kubectl get deployments --namespace ${CLUSTER_NAMESPACE} -o json | jq -r '.items[].metadata | select (.name=="redis-master") | .name ' )
       if [ -z "${REDIS_MASTER}" ]; then
         kubectl apply -f redis-master-deployment.yaml --namespace ${CLUSTER_NAMESPACE}
@@ -104,7 +143,7 @@ stages:
         kubectl apply -f redis-slave-deployment.yaml --namespace ${CLUSTER_NAMESPACE}
         kubectl apply -f redis-slave-service.yaml --namespace ${CLUSTER_NAMESPACE}
       fi
-      # TODO - add waiting loop for redis initial provisioning
+      # TODO - wait for redis initial provisioning
   - name: Check Istio config
     type: deployer
     target:
@@ -114,7 +153,23 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
+      # uncomment to debug the script
+      # set -x
+
+      # copy the script below into your app code repo (e.g. ./scripts/check_istio.sh) and 'source' it from your pipeline job
+      #    source ./scripts/check_istio.sh
+      # alternatively, you can source it from online script:
+      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_istio.sh")
+
+      # Install istio in target cluster, and wait for ready state
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_check_install.sh")
+      
+      # copy the script below into your app code repo (e.g. ./scripts/config_istio_canary.sh) and 'source' it from your pipeline job
+      #    source ./scripts/config_istio_canary.sh
+      # alternatively, you can source it from online script:
+      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/config_istio_canary.sh")
+      
+      # Configure Istio gateway with a destination rule (stable/canary), and virtual service
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_config_canary.sh")
   - name: Deploy to Kubernetes
     type: deployer
@@ -125,5 +180,31 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
+      # uncomment to debug the script
+      #set -x
+      # copy the script below into your app code repo (e.g. ./scripts/deploy_kubectl.sh) and 'source' it from your pipeline job
+      #    source ./scripts/deploy_kubectl.sh
+      # alternatively, you can source it from online script:
+      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/deploy_kubectl.sh")
+
       USE_ISTIO_GATEWAY=true
+      # Perform a kubectl deploy of container image and check on outcome
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/deploy_kubectl.sh")
+  - name: Health check
+    type: deployer
+    target:
+      region_id: ${PROD_REGION_ID}
+      resource_group: ${PROD_RESOURCE_GROUP}
+      api_key: ${API_KEY}
+      kubernetes_cluster: ${PROD_CLUSTER_NAME}
+    script: |-
+      #!/bin/bash
+      # uncomment to debug the script
+      # set -x
+      # copy the script below into your app code repo (e.g. ./scripts/check_health.sh) and 'source' it from your pipeline job
+      #    source ./scripts/check_health.sh
+      # alternatively, you can source it from online script:
+      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_health.sh")
+
+      # Check liveness and readiness probes to confirm application is healthy
+      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_health.sh")    

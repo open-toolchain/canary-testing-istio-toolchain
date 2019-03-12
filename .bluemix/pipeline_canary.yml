@@ -30,6 +30,14 @@ stages:
     image_name: ${CF_APP_NAME}
     script: |-
       #!/bin/bash
+      # uncomment to debug the script
+      # set -x
+      # copy the script below into your app code repo (e.g. ./scripts/check_prebuild.sh) and 'source' it from your pipeline job
+      #    source ./scripts/check_prebuild.sh
+      # alternatively, you can source it from online script:
+      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_prebuild.sh")
+
+      # Lints Dockerfile and checks presence of registry namespace.
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_prebuild.sh")
   - name: Build Docker image
     type: builder
@@ -42,6 +50,16 @@ stages:
     image_name: ${CF_APP_NAME}
     script: |
       #!/bin/bash
+      # uncomment to debug the script
+      #set -x
+      # copy the script below into your app code repo (e.g. ./scripts/build_image.sh) and 'source' it from your pipeline job
+      #    source ./scripts/build_image.sh
+      # alternatively, you can source it from online script:
+      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/build_image.sh")
+
+      # This script does build a Docker image into IBM Container Service private image registry.
+      # Minting image tag using format: BUILD_NUMBER-BRANCH-COMMIT_ID-TIMESTAMP
+      # Also copies information into a build.properties file, so they can be reused later on by other scripts (e.g. image url, chart name, ...)
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/build_image.sh")
 - name: VALIDATE
   inputs:
@@ -65,6 +83,14 @@ stages:
       api_key: ${API_KEY}
     script: |
       #!/bin/bash
+      # uncomment to debug the script
+      # set -x
+      # copy the script below into your app code repo (e.g. ./scripts/check_vulnerabilities.sh) and 'source' it from your pipeline job
+      #    source ./scripts/check_vulnerabilities.sh
+      # alternatively, you can source it from online script:
+      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_vulnerabilities.sh")
+
+      # Check for vulnerabilities of built image using Vulnerability Advisor
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_vulnerabilities.sh")
 - name: DEPLOY
   inputs:
@@ -90,6 +116,15 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
+      # uncomment to debug the script
+      #set -x
+      # copy the script below into your app code repo (e.g. ./scripts/check_predeploy.sh) and 'source' it from your pipeline job
+      #    source ./scripts/check_predeploy_kubectl.sh
+      # alternatively, you can source it from online script:
+      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_predeploy_kubectl.sh")
+
+      # Checks the cluster is ready, has a namespace configured with access to the private
+      # image registry (using an IBM Cloud API Key). It also configures Helm Tiller service to later perform a deploy with Helm.
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_predeploy_kubectl.sh")
   - name: Deploy to Kubernetes
     type: deployer
@@ -100,9 +135,18 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
+      # uncomment to debug the script
+      #set -x
+      # copy the script below into your app code repo (e.g. ./scripts/deploy_kubectl.sh) and 'source' it from your pipeline job
+      #    source ./scripts/deploy_kubectl.sh
+      # alternatively, you can source it from online script:
+      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/deploy_kubectl.sh")
+
       # Install 'yq' to process yaml files
       python -m site &> /dev/null && export PATH="$PATH:`python -m site --user-base`/bin"
       pip install yq
+
+      # Infer parallelel deployment configuration for canary app, using Git branch name
       echo -e "Updating $DEPLOYMENT_FILE to represent canary deployment: add label version, modify deployment name"
       CANARY_DEPLOYMENT_FILE=canary-${DEPLOYMENT_FILE} # prefix original deployment file name
       DEPLOYMENT_NAME=$( cat ${DEPLOYMENT_FILE} | yq -r '. | select(.kind=="Deployment") | .metadata.name' ) # read deployment name
@@ -112,7 +156,7 @@ stages:
       cat ${DEPLOYMENT_FILE}
       USE_ISTIO_GATEWAY=true
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/deploy_kubectl.sh")
-- name: CANARY 0%
+- name: CANARY 0% (EMERGENCY STOP)
   inputs:
   - type: job
     stage: BUILD
@@ -140,6 +184,14 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
+      # uncomment to debug the script
+      # set -x
+      # copy the script below into your app code repo (e.g. ./scripts/istio_virtualservice_stable.sh) and 'source' it from your pipeline job
+      #    source ./scripts/istio_virtualservice_stable.sh
+      # alternatively, you can source it from online script:
+      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_stable.sh")
+
+      # Route all traffic to "stable" destination (using Istio)
       echo "Stop routing traffic to 'canary' destination"
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_stable.sh")
 - name: CANARY DARK
@@ -170,6 +222,14 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
+      # uncomment to debug the script
+      # set -x
+      # copy the script below into your app code repo (e.g. ./scripts/istio_virtualservice_canary_dark.sh) and 'source' it from your pipeline job
+      #    source ./scripts/istio_virtualservice_canary_dark.sh
+      # alternatively, you can source it from online script:
+      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_canary_dark.sh")
+
+      # Only traffic matching a user-agent rule is targeting "canary" destination, the rest goes to "stable" destination (using Istio)
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_canary_dark.sh")
   - name: Functional tests
     type: deployer
@@ -220,6 +280,14 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
+      # uncomment to debug the script
+      # set -x
+      # copy the script below into your app code repo (e.g. ./scripts/istio_virtualservice_canary_weight.sh) and 'source' it from your pipeline job
+      #    source ./scripts/istio_virtualservice_canary_weight.sh
+      # alternatively, you can source it from online script:
+      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_canary_weight.sh")
+
+      # Route a fraction of traffic to "canary" destination (CANARY_WEIGHT), and rest to "stable" destination (using Istio)
       CANARY_WEIGHT=50
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_canary_weight.sh")
 - name: CANARY FINALIZE (AFTER MERGE)
@@ -250,6 +318,14 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
+      # uncomment to debug the script
+      # set -x
+      # copy the script below into your app code repo (e.g. ./scripts/istio_virtualservice_stable.sh) and 'source' it from your pipeline job
+      #    source ./scripts/istio_virtualservice_stable.sh
+      # alternatively, you can source it from online script:
+      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_stable.sh")
+
+      # Route all traffic to "stable" destination (using Istio)
       echo "Stop routing traffic to 'canary' destination"
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_stable.sh")
   - name: Discard canary deploy
@@ -263,7 +339,7 @@ stages:
       # Install 'yq' to process yaml files
       python -m site &> /dev/null && export PATH="$PATH:`python -m site --user-base`/bin"
       pip install yq
-      # read app name if present, if not default to deployment name
+      # Read deployment name from deployment manifest 
       DEPLOYMENT_NAME=$( cat ${DEPLOYMENT_FILE} | yq -r '. | select(.kind=="Deployment") | .metadata.name' ) # read deployment name
       echo "Delete canary deployment"
       kubectl delete deployment ${DEPLOYMENT_NAME}-canary --namespace ${CLUSTER_NAMESPACE}
