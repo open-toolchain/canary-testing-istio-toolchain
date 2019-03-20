@@ -11,8 +11,8 @@ root:
 #  $ref: ./nls/messages_en_ZZ.yml
 #es:
 #  $ref: ./nls/messages_es.yml
-#fr:
-#  $ref: ./nls/messages_fr.yml
+fr:
+  $ref: ./nls/messages_fr.yml
 #it:
 #  $ref: ./nls/messages_it.yml
 #ja:
