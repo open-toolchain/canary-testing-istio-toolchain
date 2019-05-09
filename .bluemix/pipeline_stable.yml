@@ -1,4 +1,5 @@
 ---
+defaultBaseImageVersion: latest
 properties:
 - name: DEPLOYMENT_FILE
   value: ${DEPLOYMENT_FILE}
