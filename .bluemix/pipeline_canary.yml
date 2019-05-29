@@ -143,16 +143,12 @@ stages:
       # alternatively, you can source it from online script:
       #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/deploy_kubectl.sh")
 
-      # Install 'yq' to process yaml files
-      python -m site &> /dev/null && export PATH="$PATH:`python -m site --user-base`/bin"
-      pip install yq
-
       # Infer parallelel deployment configuration for canary app, using Git branch name
       echo -e "Updating $DEPLOYMENT_FILE to represent canary deployment: add label version, modify deployment name"
       CANARY_DEPLOYMENT_FILE=canary-${DEPLOYMENT_FILE} # prefix original deployment file name
-      DEPLOYMENT_NAME=$( cat ${DEPLOYMENT_FILE} | yq -r '. | select(.kind=="Deployment") | .metadata.name' ) # read deployment name
-      # cat ${DEPLOYMENT_FILE} | yq --yaml-output --arg l canary --arg n ${DEPLOYMENT_NAME}-canary '. | select(.kind=="Deployment") | .metadata.labels.version = $l | .spec.template.metadata.labels.version = $l | .metadata.name = $n ' > ${CANARY_DEPLOYMENT_FILE}
-      cat ${DEPLOYMENT_FILE} | yq --yaml-output --arg l canary --arg n ${DEPLOYMENT_NAME}-canary '. | select(.kind=="Deployment") | .spec.template.metadata.labels.version = $l | .metadata.name = $n ' > ${CANARY_DEPLOYMENT_FILE}
+      DEPLOYMENT_NAME=$( cat ${DEPLOYMENT_FILE} | yq r - -j | jq -r '. | select(.kind=="Deployment") | .metadata.name' ) # read deployment name
+      # Substitute deployment name and version label (yaml>json>substitute>yaml)
+      cat ${DEPLOYMENT_FILE} | yq r - -j | jq --arg l canary --arg n ${DEPLOYMENT_NAME}-canary '. | select(.kind=="Deployment") | .spec.template.metadata.labels.version = $l | .metadata.name = $n ' | yq r - > ${CANARY_DEPLOYMENT_FILE}
       DEPLOYMENT_FILE=${CANARY_DEPLOYMENT_FILE} # replace original deployment file
       cat ${DEPLOYMENT_FILE}
       USE_ISTIO_GATEWAY=true
@@ -337,10 +333,7 @@ stages:
       kubernetes_cluster: ${PROD_CLUSTER_NAME}
     script: |
       #!/bin/bash
-      # Install 'yq' to process yaml files
-      python -m site &> /dev/null && export PATH="$PATH:`python -m site --user-base`/bin"
-      pip install yq
       # Read deployment name from deployment manifest 
-      DEPLOYMENT_NAME=$( cat ${DEPLOYMENT_FILE} | yq -r '. | select(.kind=="Deployment") | .metadata.name' ) # read deployment name
+      DEPLOYMENT_NAME=$( cat ${DEPLOYMENT_FILE} | yq r - -j | jq -r '. | select(.kind=="Deployment") | .metadata.name' ) # read deployment name
       echo "Delete canary deployment"
       kubectl delete deployment ${DEPLOYMENT_NAME}-canary --namespace ${CLUSTER_NAMESPACE}
