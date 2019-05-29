@@ -14,7 +14,7 @@ deploy.registrynsDescription: "11:The namespace in the container image registry.
 deploy.regionDescription: "12:The IBM Cloud region for prod deployment"
 deploy.clusterNameDescription: "13:The name of prod cluster. Retrieve it with [ibmcloud cs clusters] or via the console at https://cloud.ibm.com/containers-kubernetes/home/clusters."
 deploy.namespaceDescription: "14:Prod namespace"
-deploy.apikey: "15:IBM Cloud API Key"
+deploy.apikey: "15:IBM Cloud API key"
 deploy.containerregRegion: "16:Container registry region"
 deploy.containerregns: "17:Container registry namespace"
 deploy.imgregRegion: "18:Container image registry region"
