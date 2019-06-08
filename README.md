@@ -34,8 +34,8 @@ Learn how to canary test an application using Istio using 2 branches:
 
 * Blog [Continuously deliver your app to Kubernetes with Bluemix](https://www.ibm.com/blogs/bluemix/2017/07/continuously-deliver-your-app-to-kubernetes-with-bluemix/)
 * Step by step [tutorial](https://cloudcontent.mybluemix.net/cloud/garage/tutorials/use-canary-testing-in-kubernetes-using-istio-toolchain)
-* [Getting started with IBM Cloud clusters](https://cloud.ibm.com/docs/containers/container_index.html?pos=2)
+* [Getting started with IBM Cloud clusters](https://cloud.ibm.com/docs/containers?topic=containers-getting-started)
 * [Getting started with toolchains](https://cloud.ibm.com/devops/getting-started)
-* [Documentation](https://cloud.ibm.com/docs/services/ContinuousDelivery/index.html?pos=2)
+* [Documentation](https://cloud.ibm.com/docs/services/ContinuousDelivery?topic=ContinuousDelivery-getting-started&pos=2)
 * [Istio workshop](https://github.com/IBM/istio101/tree/master/workshop)
 * [Managed Istio on IBM Cloud Kubernetes](https://cloud.ibm.com/docs/containers?topic=containers-istio#istio)

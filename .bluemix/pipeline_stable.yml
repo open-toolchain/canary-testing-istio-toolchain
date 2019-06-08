@@ -1,4 +1,5 @@
 ---
+defaultBaseImageVersion: latest
 properties:
 - name: DEPLOYMENT_FILE
   value: ${DEPLOYMENT_FILE}
@@ -106,6 +107,9 @@ stages:
   - name: HELM_VERSION
     value: ''
     type: text
+  - name: DEFAULT_ISTIO_VERSION
+    value: '1.0.6'
+    type: text
   - name: CLUSTER_NAMESPACE
     value: ${PROD_CLUSTER_NAMESPACE}
     type: text
@@ -161,6 +165,7 @@ stages:
       # alternatively, you can source it from online script:
       #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_istio.sh")
 
+      # Leverage managed Istio add-on (uncomment for using a custom Istio installation)
       # Install istio in target cluster, and wait for ready state
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_check_install.sh")
       
