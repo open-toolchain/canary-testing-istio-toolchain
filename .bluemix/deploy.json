@@ -76,7 +76,7 @@
             "pattern": "\\S",
             "validator": {
                 "v-type": "k8-cluster-name",
-                "params": ["prod-region, prod-resource-group"]
+                "params": ["prod-region", "prod-resource-group"]
             }
         },
         "prod-cluster-namespace": {
