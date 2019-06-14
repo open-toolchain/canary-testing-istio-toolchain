@@ -159,8 +159,7 @@ stages:
       # alternatively, you can source it from online script:
       #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_check_install.sh")
 
-      # Leverage managed Istio add-on (uncomment for using a custom Istio installation)
-      # Install istio in target cluster, and wait for ready state
+      # Check Istio installation in target cluster
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_check_install.sh")
       
       # copy the script below into your app code repo (e.g. ./scripts/config_istio_canary.sh) and 'source' it from your pipeline job
