@@ -10,7 +10,7 @@ Application code is stored in source control, along with its Dockerfile and its 
 The target cluster is configured during toolchain setup (using an IBM Cloud API key and cluster name). You can later change these by modifying the Delivery Pipeline configuration.
 Any code change to the master branch in the Git repo will automatically be built, validated and deployed into the Kubernetes cluster.
 
-Changes to the `canary` branch will be rolled out in parallel, leveraging istio traffic management abilitiy.
+Changes to the `canary` branch will be rolled out in parallel, leveraging istio traffic management ability.
 ![Icon](./.bluemix/toolchain.png)
 
 ### To get started, click this button:
