@@ -12,10 +12,18 @@ template:
     - build
     - repo
   info:
-    git url: >-
-      [https://github.com/open-toolchain/simple-helm-toolchain](https://github.com/open-toolchain/ab-testing-istio-toolchain)
-    git branch: >-
-      [master](https://github.com/open-toolchain/ab-testing-istio-toolchain/tree/master)
+    #git url: >-
+    #  [https://github.com/open-toolchain/simple-helm-toolchain](https://github.com/open-toolchain/ab-testing-istio-toolchain)
+    #git branch: >-
+    #  [master](https://github.com/open-toolchain/ab-testing-istio-toolchain/tree/master)
+    #express the git url and branch values dynamically so that they will still be  correct after repo is forked
+    git url: >
+      "[" + $env.repository + "]" +
+        "(" + $env.repository + ")"
+    git branch: >
+      "[" + $env.branch + "]" +
+        "(" + $env.repository +
+          "/tree/" + $env.branch + ")"
 toolchain:
   name: 'canary-test-toolchain-{{timestamp}}'
   template:
