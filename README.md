@@ -10,11 +10,13 @@ Application code is stored in source control, along with its Dockerfile and its 
 The target cluster is configured during toolchain setup (using an IBM Cloud API key and cluster name). You can later change these by modifying the Delivery Pipeline configuration.
 Any code change to the master branch in the Git repo will automatically be built, validated and deployed into the Kubernetes cluster.
 
-Changes to the `canary` branch will be rolled out in parallel, leveraging istio traffic management abilitiy.
+Changes to the `canary` branch will be rolled out in parallel, leveraging istio traffic management ability.
 ![Icon](./.bluemix/toolchain.png)
 
 ### To get started, click this button:
-[![Create Toolchain](https://cloud.ibm.com/devops/graphics/create_toolchain_button.png)](https://cloud.ibm.com/devops/setup/deploy/?repository=https%3A//github.com/open-toolchain/canary-testing-istio-toolchain&env_id=ibm:yp:eu-de)
+[![Create Toolchain](https://cloud.ibm.com/devops/graphics/create_toolchain_button.png)](https://cloud.ibm.com/devops/setup/deploy/?repository=https%3A//github.com/open-toolchain/canary-testing-istio-toolchain&env_id=ibm:yp:us-south)
+
+DISCLAIMER: This toolchain uses [Istio](https://istio.io/) 1.1, which requires more resources than available in IKS lite clusters, please ensure you target a standard cluster instead. 
 
 ### Steps
 
@@ -32,8 +34,9 @@ Learn how to canary test an application using Istio using 2 branches:
 ---
 ### Learn more 
 
+* Learn about [Istio](https://istio.io/)
 * Blog [Continuously deliver your app to Kubernetes with Bluemix](https://www.ibm.com/blogs/bluemix/2017/07/continuously-deliver-your-app-to-kubernetes-with-bluemix/)
-* Step by step [tutorial](https://cloudcontent.mybluemix.net/cloud/garage/tutorials/use-canary-testing-in-kubernetes-using-istio-toolchain)
+* Step by step [tutorial](https://www.ibm.com/cloud/garage/tutorials/use-canary-testing-in-kubernetes-using-istio-toolchain)
 * [Getting started with IBM Cloud clusters](https://cloud.ibm.com/docs/containers?topic=containers-getting-started)
 * [Getting started with toolchains](https://cloud.ibm.com/devops/getting-started)
 * [Documentation](https://cloud.ibm.com/docs/services/ContinuousDelivery?topic=ContinuousDelivery-getting-started&pos=2)
