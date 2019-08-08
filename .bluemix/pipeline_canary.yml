@@ -148,7 +148,7 @@ stages:
       CANARY_DEPLOYMENT_FILE=canary-${DEPLOYMENT_FILE} # prefix original deployment file name
       DEPLOYMENT_NAME=$( cat ${DEPLOYMENT_FILE} | yq r - -j | jq -r '. | select(.kind=="Deployment") | .metadata.name' ) # read deployment name
       # Substitute deployment name and version label (yaml>json>substitute>yaml)
-      cat ${DEPLOYMENT_FILE} | yq r - -j | jq --arg l canary --arg n ${DEPLOYMENT_NAME}-canary '. | select(.kind=="Deployment") | .spec.template.metadata.labels.version = $l | .metadata.name = $n ' | yq r - > ${CANARY_DEPLOYMENT_FILE}
+      cat ${DEPLOYMENT_FILE} | yq write -d0 - "spec.template.metadata.labels.version" "canary" | yq write -d0 - "metadata.name" "${DEPLOYMENT_NAME}-canary" | yq write -d0 - "metadata.labels.version" "canary" > ${CANARY_DEPLOYMENT_FILE}
       DEPLOYMENT_FILE=${CANARY_DEPLOYMENT_FILE} # replace original deployment file
       cat ${DEPLOYMENT_FILE}
       USE_ISTIO_GATEWAY=true
