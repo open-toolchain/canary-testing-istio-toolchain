@@ -13,7 +13,7 @@ template.description: "Avec cette chaîne d'outils, vous pouvez développer, tes
   
   \n\nAvertissement : cette chaîne d'outils utilise [Istio](https://istio.io/) 1.1, qui nécessite plus de ressources que celles disponibles dans les clusters IKS lite, veuillez vous assurer de cibler un cluster standard à la place."
 template.gettingStarted: " **Votre chaîne d'outils est prête !**
-  \n\n**Démarrage rapide :** validez une modification sur la branche canary dans le référentiel Git afin de démarrer le test canary d'une nouvelle fonction dans votre cluster Kubernetes. Pour obtenir des instructions étape par étape, reportez-vous au [tutoriel](https://www.ibm.com/cloud/garage/tutorials/use-canary-testing-in-kubernetes-using-istio-toolchain) relatif à cette chaîne d'outils.
+  \n**Démarrage rapide :** validez une modification sur la branche canary dans le référentiel Git afin de démarrer le test canary d'une nouvelle fonction dans votre cluster Kubernetes. Pour obtenir des instructions étape par étape, reportez-vous au [tutoriel](https://www.ibm.com/cloud/garage/tutorials/use-canary-testing-in-kubernetes-using-istio-toolchain) relatif à cette chaîne d'outils.
   
   \n\nAvertissement : cette chaîne d'outils utilise [Istio](https://istio.io/) 1.1, qui nécessite plus de ressources que celles disponibles dans les clusters IKS lite, veuillez vous assurer de cibler un cluster standard à la place."
 deploy.title: "Etape de déploiement Hello World"

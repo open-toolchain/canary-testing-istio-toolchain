@@ -13,7 +13,7 @@ template.description: "このツールチェーンを使用して、アプリケ
   
   \n\nDISCLAIMER: このツールチェーンでは [Istio](https://istio.io/) 1.1 が使用されます。これには、IKS ライト・クラスターで使用できるリソースより多くのリソースが必要となります。代わりに標準クラスターをターゲットにしてください。"
 template.gettingStarted: " **ツールチェーンの準備ができました。**
-  \n\n**クイック・スタート:** カナリア・ブランチでの Git リポジトリーに対する変更をコミットし、Kubernetes クラスターで新規フィーチャーのカナリア・テストを開始してください。段階的な説明については、このツールチェーンの[チュートリアル](https://www.ibm.com/cloud/garage/tutorials/use-canary-testing-in-kubernetes-using-istio-toolchain) を参照してください。
+  \n**クイック・スタート:** カナリア・ブランチでの Git リポジトリーに対する変更をコミットし、Kubernetes クラスターで新規フィーチャーのカナリア・テストを開始してください。段階的な説明については、このツールチェーンの[チュートリアル](https://www.ibm.com/cloud/garage/tutorials/use-canary-testing-in-kubernetes-using-istio-toolchain) を参照してください。
   
   \n\nDISCLAIMER: このツールチェーンでは [Istio](https://istio.io/) 1.1 が使用されます。これには、IKS ライト・クラスターで使用できるリソースより多くのリソースが必要となります。代わりに標準クラスターをターゲットにしてください。"
 deploy.title: "Hello World のデプロイ・ステージ"
