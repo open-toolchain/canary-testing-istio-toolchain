@@ -13,7 +13,7 @@ template.description: "Com esta cadeia de ferramentas, é possível desenvolver,
   
   \n\nAVISO: essa cadeia de ferramentas usa o [Istio](https://istio.io/) 1.1, que requer mais recursos do que os disponíveis em clusters lite IKS. Assegure-se de ter como alvo um cluster padrão, em vez disso."
 template.gettingStarted: " **Sua cadeia de ferramentas está pronta!**
-  \n\n**Iniciação rápida:** confirme uma mudança na ramificação canária no repositório Git para iniciar o teste Canary em um novo recurso em seu cluster Kubernetes. Para obter instruções passo a passo, consulte o [tutorial](https://www.ibm.com/cloud/garage/tutorials/use-canary-testing-in-kubernetes-using-istio-toolchain) para essa cadeia de ferramentas.
+  \n**Iniciação rápida:** confirme uma mudança na ramificação canária no repositório Git para iniciar o teste Canary em um novo recurso em seu cluster Kubernetes. Para obter instruções passo a passo, consulte o [tutorial](https://www.ibm.com/cloud/garage/tutorials/use-canary-testing-in-kubernetes-using-istio-toolchain) para essa cadeia de ferramentas.
   
   \n\nAVISO: essa cadeia de ferramentas usa o [Istio](https://istio.io/) 1.1, que requer mais recursos do que os disponíveis em clusters lite IKS. Assegure-se de ter como alvo um cluster padrão, em vez disso."
 deploy.title: "Estágio de Implementação Hello World"
