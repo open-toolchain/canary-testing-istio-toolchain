@@ -1,21 +1,8 @@
 ---
 #The format for creating a link with a URL and text is [link text](link url) with no spaces or characters between the two sets of brackets- []()
 template.name: "Développez et testez avec canary une application Kubernetes utilisant Istio"
-template.description: "Avec cette chaîne d'outils, vous pouvez développer, tester à l'aide d'un test A/B et déployer une application de manière sécurisée dans un cluster Kubernetes géré par le service IBM Cloud Container Service. Par défaut, la chaîne d'outils utilise un exemple d'application Node.js \"Hello World\", mais vous pouvez créer un lien vers votre propre référentiel Git à la place. Cette chaîne d'outils est préconfigurée pour la distribution continue avec le test A/B, [Vulnerability Advisor](https://www.ibm.com/blogs/bluemix/2016/06/docker-container-security-with-vulnerability-advisor/), le contrôle des sources, le suivi de problème et l'édition en ligne.
-  
-   Vous pouvez gérer vos clusters IBM Cloud Container dans la [console](https://cloud.ibm.com/kubernetes/clusters).
-  
-  Cette chaîne d'outils utilise des outils qui font partie du service Continuous Delivery. Si aucune instance de ce service n'existe dans l'organisation ou le groupe de ressources sélectionné, elle est automatiquement ajoutée lorsque vous cliquez sur **Créer**, avec le plan gratuit [Lite](/catalog/services/continuous-delivery/) sélectionné.
-  
-  Pour commencer, cliquez sur **Créer**.
-  
-  Pour obtenir des instructions étape par étape, reportez-vous au [tutoriel](https://www.ibm.com/cloud/garage/tutorials/use-canary-testing-in-kubernetes-using-istio-toolchain).
-  
-  Avertissement : cette chaîne d'outils utilise [Istio](https://istio.io/) 1.1, qui nécessite plus de ressources que celles disponibles dans les clusters IKS lite, veuillez vous assurer de cibler un cluster standard à la place."
-template.gettingStarted: " **Votre chaîne d'outils est prête !**
-  **Démarrage rapide :** validez une modification sur la branche canary dans le référentiel Git afin de démarrer le test canary d'une nouvelle fonction dans votre cluster Kubernetes. Pour obtenir des instructions étape par étape, reportez-vous au [tutoriel](https://www.ibm.com/cloud/garage/tutorials/use-canary-testing-in-kubernetes-using-istio-toolchain) relatif à cette chaîne d'outils.
-  
-  Avertissement : cette chaîne d'outils utilise [Istio](https://istio.io/) 1.1, qui nécessite plus de ressources que celles disponibles dans les clusters IKS lite, veuillez vous assurer de cibler un cluster standard à la place."
+template.description: "Avec cette chaîne d'outils, vous pouvez développer, tester à l'aide d'un test A/B et déployer une application de manière sécurisée dans un cluster Kubernetes géré par le service IBM Cloud Container Service. Par défaut, la chaîne d'outils utilise un exemple d'application Node.js \"Hello World\", mais vous pouvez créer un lien vers votre propre référentiel Git à la place. Cette chaîne d'outils est préconfigurée pour la distribution continue avec le test A/B, [Vulnerability Advisor](https://www.ibm.com/blogs/bluemix/2016/06/docker-container-security-with-vulnerability-advisor/), le contrôle des sources, le suivi de problème et l'édition en ligne.\n\n Vous pouvez gérer vos clusters IBM Cloud Container dans la [console](https://cloud.ibm.com/kubernetes/clusters).\n\nCette chaîne d'outils utilise des outils qui font partie du service Continuous Delivery. Si aucune instance de ce service n'existe dans l'organisation ou le groupe de ressources sélectionné, elle est automatiquement ajoutée lorsque vous cliquez sur **Créer**, avec le plan gratuit [Lite](/catalog/services/continuous-delivery/) sélectionné.\n\nPour commencer, cliquez sur **Créer**.\n\nPour obtenir des instructions étape par étape, reportez-vous au [tutoriel](https://www.ibm.com/cloud/garage/tutorials/use-canary-testing-in-kubernetes-using-istio-toolchain).\n\nAvertissement : cette chaîne d'outils utilise [Istio](https://istio.io/) 1.1, qui nécessite plus de ressources que celles disponibles dans les clusters IKS lite, veuillez vous assurer de cibler un cluster standard à la place."
+template.gettingStarted: " **Votre chaîne d'outils est prête !**\n**Démarrage rapide :** validez une modification sur la branche canary dans le référentiel Git afin de démarrer le test canary d'une nouvelle fonction dans votre cluster Kubernetes. Pour obtenir des instructions étape par étape, reportez-vous au [tutoriel](https://www.ibm.com/cloud/garage/tutorials/use-canary-testing-in-kubernetes-using-istio-toolchain) relatif à cette chaîne d'outils.\n\nAvertissement : cette chaîne d'outils utilise [Istio](https://istio.io/) 1.1, qui nécessite plus de ressources que celles disponibles dans les clusters IKS lite, veuillez vous assurer de cibler un cluster standard à la place."
 deploy.title: "Etape de déploiement Hello World"
 deploy.description: "Chaîne d'outils hello-world simple"
 deploy.longDescription: "Delivery Pipeline automatise la génération, le test et le déploiement continu de l'application Docker."
@@ -56,3 +43,9 @@ headerSVG.bluemix: "BLUEMIX"
 headerSVG.webIde: "IDE WEB"
 headerSVG.kubernetes: "Kubernetes"
 headerSVG.cluster: "Cluster"
+headerSVG.github1: "GitHub"
+headerSVG.github2: "GitHub"
+headerSVG.gitlab3: "GitLab"
+headerSVG.gitlab4: "GitLab"
+headerSVG.bitbucket1: "Bitbucket"
+headerSVG.bitbucket2: "Bitbucket"
