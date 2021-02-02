@@ -92,6 +92,9 @@ services:
           PROD_CLUSTER_NAME: '{{form.pipeline.parameters.prod-cluster-name}}'
           PROD_CLUSTER_NAMESPACE: '{{form.pipeline.parameters.prod-cluster-namespace}}'
         execute: false
+  devops-insights:
+      service_id: >
+        $env.env_id !== 'ibm:ys1:us-south' ? 'draservicebroker' : ''
   webide:
     service_id: orion
 form:
