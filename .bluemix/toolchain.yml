@@ -25,7 +25,7 @@ template:
       "[" + $env.branch + "]" +
         "(" + $env.repository +
           "/tree/" + $env.branch + ")"
-    hosted_reion: ""
+    hosted_region: ""
 toolchain:
   name: 'canary-test-toolchain-{{timestamp}}'
   template:
