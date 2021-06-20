@@ -9,6 +9,10 @@ properties:
   type: secure
 - name: APP_NAME
   value: ${CF_APP_NAME}
+- name: COMMONS_HOSTED_REGION
+  value: ${COMMONS_HOSTED_REGION}
+  type: text
+  default: "https://raw.githubusercontent.com/open-toolchain/commons/master"
 stages:
 - name: BUILD
   inputs:
@@ -41,10 +45,10 @@ stages:
       # copy the script below into your app code repo (e.g. ./scripts/check_prebuild.sh) and 'source' it from your pipeline job
       #    source ./scripts/check_prebuild.sh
       # alternatively, you can source it from online script:
-      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_prebuild.sh")
+      #    source <(curl -sSL "${COMMONS_HOSTED_REGION}/scripts/check_prebuild.sh")
 
       # Lints Dockerfile and checks presence of registry namespace.
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_prebuild.sh")
+      source <(curl -sSL "${COMMONS_HOSTED_REGION}/scripts/check_prebuild.sh")
   - name: Build Docker image
     type: builder
     build_type: cr
@@ -61,12 +65,12 @@ stages:
       # copy the script below into your app code repo (e.g. ./scripts/build_image_buildkit.sh) and 'source' it from your pipeline job
       #    source ./scripts/build_image_buildkit.sh
       # alternatively, you can source it from online script:
-      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/build_image_buildkit.sh")
+      #    source <(curl -sSL "${COMMONS_HOSTED_REGION}/scripts/build_image_buildkit.sh")
 
       # This script does build a Docker image into IBM Container Service private image registry.
       # Minting image tag using format: BUILD_NUMBER-BRANCH-COMMIT_ID-TIMESTAMP
       # Also copies information into a build.properties file, so they can be reused later on by other scripts (e.g. image url, chart name, ...)
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/build_image_buildkit.sh")
+      source <(curl -sSL "${COMMONS_HOSTED_REGION}/scripts/build_image_buildkit.sh")
       # check if doi is integrated in this toolchain
       if jq -e '.services[] | select(.service_id=="draservicebroker")' _toolchain.json; then
         ibmcloud login --apikey ${IBM_CLOUD_API_KEY} --no-region
@@ -120,11 +124,11 @@ stages:
       # copy the script below into your app code repo (e.g. ./scripts/check_vulnerabilities.sh) and 'source' it from your pipeline job
       #    source ./scripts/check_vulnerabilities.sh
       # alternatively, you can source it from online script:
-      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_vulnerabilities.sh")
+      #    source <(curl -sSL "${COMMONS_HOSTED_REGION}/scripts/check_vulnerabilities.sh")
 
       # Check for vulnerabilities of built image using Vulnerability Advisor
       SOURCE_BUILD_NUMBER=$BUILD_NUMBER
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_vulnerabilities.sh")
+      source <(curl -sSL "${COMMONS_HOSTED_REGION}/scripts/check_vulnerabilities.sh")
 - name: DEPLOY
   inputs:
   - type: job
@@ -154,11 +158,11 @@ stages:
       # copy the script below into your app code repo (e.g. ./scripts/check_predeploy.sh) and 'source' it from your pipeline job
       #    source ./scripts/check_predeploy_kubectl.sh
       # alternatively, you can source it from online script:
-      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_predeploy_kubectl.sh")
+      #    source <(curl -sSL "${COMMONS_HOSTED_REGION}/scripts/check_predeploy_kubectl.sh")
 
       # Checks the cluster is ready, has a namespace configured with access to the private
       # image registry (using an IBM Cloud API Key). It also configures Helm Tiller service to later perform a deploy with Helm.
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_predeploy_kubectl.sh")
+      source <(curl -sSL "${COMMONS_HOSTED_REGION}/scripts/check_predeploy_kubectl.sh")
   - name: Deploy to Kubernetes
     type: deployer
     target:
@@ -173,7 +177,7 @@ stages:
       # copy the script below into your app code repo (e.g. ./scripts/deploy_kubectl.sh) and 'source' it from your pipeline job
       #    source ./scripts/deploy_kubectl.sh
       # alternatively, you can source it from online script:
-      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/deploy_kubectl.sh")
+      #    source <(curl -sSL "${COMMONS_HOSTED_REGION}/scripts/deploy_kubectl.sh")
 
       # Infer parallelel deployment configuration for canary app, using Git branch name
       echo -e "Updating $DEPLOYMENT_FILE to represent canary deployment: add label version, modify deployment name"
@@ -184,7 +188,7 @@ stages:
       DEPLOYMENT_FILE=${CANARY_DEPLOYMENT_FILE} # replace original deployment file
       cat ${DEPLOYMENT_FILE}
       USE_ISTIO_GATEWAY=true
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/deploy_kubectl.sh")
+      source <(curl -sSL "${COMMONS_HOSTED_REGION}/scripts/deploy_kubectl.sh")
 - name: CANARY 0% (EMERGENCY STOP)
   inputs:
   - type: job
@@ -218,11 +222,11 @@ stages:
       # copy the script below into your app code repo (e.g. ./scripts/istio_virtualservice_stable.sh) and 'source' it from your pipeline job
       #    source ./scripts/istio_virtualservice_stable.sh
       # alternatively, you can source it from online script:
-      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_stable.sh")
+      #    source <(curl -sSL "${COMMONS_HOSTED_REGION}/scripts/istio_virtualservice_stable.sh")
 
       # Route all traffic to "stable" destination (using Istio)
       echo "Stop routing traffic to 'canary' destination"
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_stable.sh")
+      source <(curl -sSL "${COMMONS_HOSTED_REGION}/scripts/istio_virtualservice_stable.sh")
 - name: CANARY DARK
   inputs:
   - type: job
@@ -256,10 +260,10 @@ stages:
       # copy the script below into your app code repo (e.g. ./scripts/istio_virtualservice_canary_dark.sh) and 'source' it from your pipeline job
       #    source ./scripts/istio_virtualservice_canary_dark.sh
       # alternatively, you can source it from online script:
-      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_canary_dark.sh")
+      #    source <(curl -sSL "${COMMONS_HOSTED_REGION}/scripts/istio_virtualservice_canary_dark.sh")
 
       # Only traffic matching a user-agent rule is targeting "canary" destination, the rest goes to "stable" destination (using Istio)
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_canary_dark.sh")
+      source <(curl -sSL "${COMMONS_HOSTED_REGION}/scripts/istio_virtualservice_canary_dark.sh")
   - name: Functional tests
     type: deployer
     target:
@@ -314,11 +318,11 @@ stages:
       # copy the script below into your app code repo (e.g. ./scripts/istio_virtualservice_canary_weight.sh) and 'source' it from your pipeline job
       #    source ./scripts/istio_virtualservice_canary_weight.sh
       # alternatively, you can source it from online script:
-      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_canary_weight.sh")
+      #    source <(curl -sSL "${COMMONS_HOSTED_REGION}/scripts/istio_virtualservice_canary_weight.sh")
 
       # Route a fraction of traffic to "canary" destination (CANARY_WEIGHT), and rest to "stable" destination (using Istio)
       CANARY_WEIGHT=50
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_canary_weight.sh")
+      source <(curl -sSL "${COMMONS_HOSTED_REGION}/scripts/istio_virtualservice_canary_weight.sh")
 - name: CANARY FINALIZE (AFTER MERGE)
   inputs:
   - type: job
@@ -352,11 +356,11 @@ stages:
       # copy the script below into your app code repo (e.g. ./scripts/istio_virtualservice_stable.sh) and 'source' it from your pipeline job
       #    source ./scripts/istio_virtualservice_stable.sh
       # alternatively, you can source it from online script:
-      #    source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_stable.sh")
+      #    source <(curl -sSL "${COMMONS_HOSTED_REGION}/scripts/istio_virtualservice_stable.sh")
 
       # Route all traffic to "stable" destination (using Istio)
       echo "Stop routing traffic to 'canary' destination"
-      source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/istio_virtualservice_stable.sh")
+      source <(curl -sSL "${COMMONS_HOSTED_REGION}/scripts/istio_virtualservice_stable.sh")
   - name: Discard canary deploy
     type: deployer
     target:
