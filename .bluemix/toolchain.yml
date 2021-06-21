@@ -25,6 +25,7 @@ template:
       "[" + $env.branch + "]" +
         "(" + $env.repository +
           "/tree/" + $env.branch + ")"
+    hosted_region: ""
 toolchain:
   name: 'canary-test-toolchain-{{timestamp}}'
   template:
@@ -37,11 +38,13 @@ services:
     parameters:
       repo_name: 'guestbook-{{timestamp}}'
       repo_url: >
-        $env.type === 'link' ? 
-          $env.app_repo : 'https://github.com/open-toolchain/guestbook'
+        $env.type === 'link' ? $env.app_repo : 
+        $env.template.info.hosted_region !== "" ? 'https://{{template.info.hosted_region}}.git.cloud.ibm.com/open-toolchain/guestbook':
+        'https://github.com/open-toolchain/guestbook'
       source_repo_url: >
-        $env.type === 'fork' || $env.type === 'clone' ? 
-          $env.app_repo : 'https://github.com/open-toolchain/guestbook'
+        $env.type === 'fork' || $env.type === 'clone' ? $env.app_repo : 
+        $env.template.info.hosted_region !== "" ? 'https://{{template.info.hosted_region}}.git.cloud.ibm.com/open-toolchain/guestbook':
+        'https://github.com/open-toolchain/guestbook'
       type: $env.type || 'clone'
       has_issues: true
   build_stable:
@@ -56,7 +59,8 @@ services:
           $text: pipeline_stable.yml
         env:
           GIT_REPO: repo
-          GIT_BRANCH: master
+          GIT_BRANCH: >
+            $env.template.info.hosted_region !== "" ? 'main': 'master'
           DOCKER_ROOT: guestbook
           DEPLOYMENT_FILE: guestbook-deployment.yaml
           CF_APP_NAME: '{{form.pipeline.parameters.app-name}}'
@@ -67,6 +71,9 @@ services:
           PROD_RESOURCE_GROUP: '{{form.pipeline.parameters.prod-resource-group}}'
           PROD_CLUSTER_NAME: '{{form.pipeline.parameters.prod-cluster-name}}'
           PROD_CLUSTER_NAMESPACE: '{{form.pipeline.parameters.prod-cluster-namespace}}'
+          COMMONS_HOSTED_REGION: >
+            $env.template.info.hosted_region !== "" ? 'https://{{template.info.hosted_region}}.git.cloud.ibm.com/open-toolchain/commons/-/raw/main':
+            'https://raw.githubusercontent.com/open-toolchain/commons/master'
         execute: true
   build_canary:
     service_id: pipeline
@@ -91,6 +98,9 @@ services:
           PROD_RESOURCE_GROUP: '{{form.pipeline.parameters.prod-resource-group}}'
           PROD_CLUSTER_NAME: '{{form.pipeline.parameters.prod-cluster-name}}'
           PROD_CLUSTER_NAMESPACE: '{{form.pipeline.parameters.prod-cluster-namespace}}'
+          COMMONS_HOSTED_REGION: >
+            $env.template.info.hosted_region !== "" ? 'https://{{template.info.hosted_region}}.git.cloud.ibm.com/open-toolchain/commons/-/raw/main':
+            'https://raw.githubusercontent.com/open-toolchain/commons/master'
         execute: false
   devops-insights:
       service_id: >
