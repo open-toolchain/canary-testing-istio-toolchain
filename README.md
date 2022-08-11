@@ -1,4 +1,6 @@
-# ![Icon](./.bluemix/istio-logo.png) Canary testing in Kubernetes using Istio
+# This template has been deprecated and is no longer supported.
+
+## ![Icon](./.bluemix/istio-logo.png) Canary testing in Kubernetes using Istio
 
 ### Develop and canary test your Kubernetes application using Istio
 
